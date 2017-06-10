@@ -4,9 +4,11 @@ project(unemployed_morrons)
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
+include_directories(include)
+
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES src/main.cpp)
+set(SOURCE_FILES src/main.cpp src/Monitor.cpp src/Monitor.h)
 add_executable(unemployed_morrons ${SOURCE_FILES})
 
 target_link_libraries(unemployed_morrons ${MPI_LIBRARIES})
