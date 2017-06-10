@@ -6,7 +6,7 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 include_directories(include)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 set(SOURCE_FILES src/main.cpp src/Monitor.cpp src/Monitor.h)
 add_executable(unemployed_morrons ${SOURCE_FILES})
