@@ -16,9 +16,9 @@ Monitor::~Monitor() {
     MPI_Finalize();
 }
 
-void Monitor::send(std::stringstream stringStreamMessage, int destination, int tag) {
+void Monitor::send(std::stringstream &stringStreamMessage, int destination, int tag) {
     //add 1 because after conversion to c_str null will be added
-    int count = dynamic_cast<int>(stringStreamMessage.str().length()) + 1;
+    int count = stringStreamMessage.str().length() + 1;
     MPI_Send(stringStreamMessage.str().c_str(), count, MPI_CHAR, destination, tag, mpiComm);
 }
 

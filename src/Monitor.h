@@ -17,10 +17,10 @@ public:
     Monitor(int *argc, char ***argv, MPI_Comm mpiComm = MPI_COMM_WORLD);
     ~Monitor();
 
-    void send(std::stringstream stringStreamMessage, int destination, int tag);
-    std::stringstream receive(int source, int tag);
-    int probeAndGetCount(int source, int tag);
-    MPI_Status probe(int source, int tag);
+    void send(std::stringstream &stringStreamMessage, int destination, int tag);
+    std::stringstream receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
+    int probeAndGetCount(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
+    MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int getCount(MPI_Status &status);
 };
 
