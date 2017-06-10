@@ -1,7 +1,23 @@
 cmake_minimum_required(VERSION 3.7)
 project(unemployed_morrons)
 
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES src/main.cpp)
 add_executable(unemployed_morrons ${SOURCE_FILES})
+
+target_link_libraries(unemployed_morrons ${MPI_LIBRARIES})
+
+if (MPI_COMPILE_FLAGS)
+    message("ASD")
+    set_target_properties(unemployed_morrons PROPERTIES
+            COMPILE_FLAGS "MPI_COMPILE_FLAGS")
+endif ()
+
+if (MPI_LINK_FLAGS)
+    set_target_properties(unemployed_morrons PROPERTIES
+            LINK_FLAGS "${MPI_LINK_FLAGS}")
+endif ()
