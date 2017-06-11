@@ -11,11 +11,13 @@
 
 class Monitor {
 public:
+    static const int ANY_SOURCE = MPI_ANY_SOURCE;
+    static const int ANY_TAG = MPI_ANY_TAG;
     int rank;
     int size;
     MPI_Comm mpiComm;
 
-    Monitor(int *argc, char ***argv, MPI_Comm mpiComm = MPI_COMM_WORLD);
+    Monitor(int *argc = nullptr, char ***argv = nullptr, MPI_Comm mpiComm = MPI_COMM_WORLD);
     ~Monitor();
 
     void send(Packet &package);

@@ -31,7 +31,7 @@ Packet Monitor::receive(int source, int tag) {
     std::unique_ptr<char> buffer(new char[count]);
     MPI_Status status;
     MPI_Recv(buffer.get(), count, MPI_CHAR, source, tag, mpiComm, &status);
-    std::stringstream stringstream(buffer.get());
+    std::stringstream stringstream(std::string(buffer.get(), count));
     return Packet(stringstream, status.MPI_SOURCE, status.MPI_TAG);
 }
 

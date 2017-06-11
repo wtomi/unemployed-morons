@@ -7,10 +7,11 @@
 #include "../src/Monitor.h"
 #include "../src/Message.h"
 #include "../src/Serializer.h"
+#include "../src/Messanger.h"
 
-TEST_CASE("Sending and receiving packets", "[send, receive, packet]") {
+TEST_CASE("Sending and receiving packets", "[send]") {
 
-    Monitor monitor(nullptr, nullptr);
+    Monitor monitor;
 
     const int TAG = 0;
     std::string stringMessage("Hello!");
@@ -22,13 +23,11 @@ TEST_CASE("Sending and receiving packets", "[send, receive, packet]") {
         }
     } else {
         Packet aPackage = monitor.receive();
-        std::cout << aPackage.stringstreamMessage.str() << "\n";
         REQUIRE(aPackage.stringstreamMessage.str().compare(stringMessage) == 0);
     }
 }
 
-TEST_CASE("Message serializing and deserializeing", "[serialize, deserialize, message, serializer]") {
-
+TEST_CASE("Message serializing and deserializing", "[serialize]") {
     Message message;
     message.clock = 5;
     message.word.assign("Hello");
@@ -40,4 +39,24 @@ TEST_CASE("Message serializing and deserializeing", "[serialize, deserialize, me
 
     REQUIRE(message.clock == deserializedMessage.clock);
     REQUIRE(message.word.compare(deserializedMessage.word) == 0);
+}
+
+TEST_CASE("Test Messendeg", "[messanger]") {
+    Message message;
+    message.clock = 5;
+    message.word.assign("Hello");
+    message.tag = 0;
+
+    Messanger messanger;
+
+    if(messanger.getRank() == 0) {
+        for(int i = 1; i < messanger.getSize(); i++) {
+            message.rank = i;
+            messanger.send(message);
+        }
+    } else {
+        Message receivedMessage = messanger.receive();
+        REQUIRE(message.clock == receivedMessage.clock);
+        REQUIRE(message.word.compare(receivedMessage.word) == 0);
+    }
 }

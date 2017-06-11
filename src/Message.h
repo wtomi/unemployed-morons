@@ -13,6 +13,9 @@ public:
     long clock;
     std::string word;
 
+    int rank = -1;
+    int tag = -1;
+
     template<class Archive>
     void serialize(Archive &ar) {
         ar(clock, word);
