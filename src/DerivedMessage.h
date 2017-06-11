@@ -27,6 +27,6 @@ private:
     }
 };
 
-//CEREAL_REGISTER_TYPE(DerivedMessage);
+CEREAL_REGISTER_TYPE(DerivedMessage);
 
 #endif //UNEMPLOYED_MORRONS_DERIVEDMESSAGE_H

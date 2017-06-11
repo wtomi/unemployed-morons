@@ -22,7 +22,7 @@ public:
 
     static SharedPtr Create();
 
-//    virtual void foo() {}
+    virtual void foo() {}
 
 protected:
     friend class cereal::access;

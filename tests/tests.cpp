@@ -79,6 +79,7 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     auto derivedMessage = DerivedMessage::Create();
     derivedMessage->clock = 10;
     derivedMessage->tag = 0;
+    derivedMessage->myword.assign("Hello");
     Message::SharedPtr message = derivedMessage;
 
     if (messenger.getRank() == 0) {
@@ -93,6 +94,7 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
         REQUIRE(message->tag == receivedMessage->tag);
         auto derivedMessage = std::static_pointer_cast<DerivedMessage>(message);
         auto receivedDerivedMessage = std::static_pointer_cast<DerivedMessage>(receivedMessage);
+        REQUIRE(derivedMessage->myword.compare(receivedDerivedMessage->myword) == 0);
     }
 }
 
