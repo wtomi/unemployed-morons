@@ -11,6 +11,7 @@
 #include "../src/Messenger.h"
 #include "../src/DerivedMessage.h"
 #include "../src/Configuration.h"
+#include "../src/RequestCompanyMessage.h"
 
 TEST_CASE("Sending and receiving packets", "[monitor]") {
 
@@ -92,8 +93,8 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
 
         REQUIRE(message->clock == receivedMessage->clock);
         REQUIRE(message->tag == receivedMessage->tag);
-        auto derivedMessage = std::static_pointer_cast<DerivedMessage>(message);
-        auto receivedDerivedMessage = std::static_pointer_cast<DerivedMessage>(receivedMessage);
+        auto derivedMessage = std::dynamic_pointer_cast<DerivedMessage>(message);
+        auto receivedDerivedMessage = std::dynamic_pointer_cast<DerivedMessage>(receivedMessage);
         REQUIRE(derivedMessage->myword.compare(receivedDerivedMessage->myword) == 0);
     }
 }
@@ -107,5 +108,29 @@ TEST_CASE("Test configuration", "[configuration]") {
     for (int i = 0; i < companies.size(); i++) {
         REQUIRE(maxDamageLevels[i] == companies[i].maxDamageLevel);
         REQUIRE(maxNumberOfMorons[i] == companies[i].maxMorons);
+    }
+}
+
+TEST_CASE("Test request message", "[request]") {
+    Messenger messenger;
+
+    auto requestMessage = RequestCompanyMessage::Create();
+    requestMessage->clock = 5;
+    requestMessage->companyId = 10;
+    requestMessage->requestedPlaces = 8;
+    requestMessage->tag = 1;
+
+    Message::SharedPtr message = requestMessage;
+
+    if(messenger.getRank() == 0) {
+        messenger.sendToAll(message);
+    } else {
+        Message::SharedPtr receivedMessage;
+        receivedMessage = messenger.receive();
+        REQUIRE(receivedMessage->tag == requestMessage->tag);
+        REQUIRE(receivedMessage->clock == requestMessage->clock);
+        auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
+        REQUIRE(receivedRequestMessage->companyId == requestMessage->companyId);
+        REQUIRE(receivedRequestMessage->requestedPlaces == requestMessage->requestedPlaces);
     }
 }
