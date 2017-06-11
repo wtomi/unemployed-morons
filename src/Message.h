@@ -19,11 +19,10 @@ public:
     int tag = -1;
 
     long clock;
-    std::string word;
 
     static SharedPtr Create();
 
-    virtual void sayWord();
+//    virtual void foo() {}
 
 protected:
     friend class cereal::access;
@@ -31,7 +30,7 @@ protected:
 
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(clock, word);
+        ar(clock);
     }
 };
 

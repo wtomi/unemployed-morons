@@ -33,14 +33,12 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
 TEST_CASE("Message serializing and deserializing", "[serializer]") {
     auto message = Message::Create();
     message->clock = 5;
-    message->word.assign("Hello");
 
     auto stringstream = Serializer::serialize(message);
 
     auto deserializedMessage = Serializer::deserialize(stringstream);
 
     REQUIRE(message->clock == deserializedMessage->clock);
-    REQUIRE(message->word.compare(deserializedMessage->word) == 0);
 }
 
 TEST_CASE("Test Messenger", "[messenger]") {
@@ -48,7 +46,6 @@ TEST_CASE("Test Messenger", "[messenger]") {
     Messenger messenger;
     auto message = Message::Create();
     message->clock = 5;
-    message->word.assign("Hello");
     message->tag = 0;
 
     SECTION("Simple send") {
@@ -60,7 +57,6 @@ TEST_CASE("Test Messenger", "[messenger]") {
         } else {
             auto receivedMessage = messenger.receive();
             REQUIRE(message->clock == receivedMessage->clock);
-            REQUIRE(message->word.compare(receivedMessage->word) == 0);
             REQUIRE(message->tag == receivedMessage->tag);
         }
     }
@@ -72,7 +68,6 @@ TEST_CASE("Test Messenger", "[messenger]") {
             auto receivedMessage = messenger.receive();
             REQUIRE(receivedMessage->rank != messenger.getRank());
             REQUIRE(message->clock == receivedMessage->clock);
-            REQUIRE(message->word.compare(receivedMessage->word) == 0);
             REQUIRE(message->tag == receivedMessage->tag);
         }
     }
@@ -82,8 +77,6 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     Messenger messenger;
 
     auto derivedMessage = DerivedMessage::Create();
-    derivedMessage->word = "Hello";
-    derivedMessage->myword = "My Hello";
     derivedMessage->clock = 10;
     derivedMessage->tag = 0;
     Message::SharedPtr message = derivedMessage;
@@ -96,13 +89,10 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     } else {
         Message::SharedPtr receivedMessage = messenger.receive();
 
-        receivedMessage->sayWord();
         REQUIRE(message->clock == receivedMessage->clock);
         REQUIRE(message->tag == receivedMessage->tag);
-        REQUIRE(message->word.compare(receivedMessage->word) == 0);
-        auto derivedMessage = std::dynamic_pointer_cast<DerivedMessage>(message);
-        auto receivedDerivedMessage = std::dynamic_pointer_cast<DerivedMessage>(receivedMessage);
-        REQUIRE(derivedMessage->myword.compare(receivedDerivedMessage->myword) == 0);
+        auto derivedMessage = std::static_pointer_cast<DerivedMessage>(message);
+        auto receivedDerivedMessage = std::static_pointer_cast<DerivedMessage>(receivedMessage);
     }
 }
 

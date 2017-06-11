@@ -16,7 +16,6 @@ public:
     std::string myword;
 
     static DerivedMessage::SharedPtr Create();
-    void sayWord();
 
 private:
     friend class cereal::access;
@@ -28,6 +27,6 @@ private:
     }
 };
 
-CEREAL_REGISTER_TYPE(DerivedMessage);
+//CEREAL_REGISTER_TYPE(DerivedMessage);
 
 #endif //UNEMPLOYED_MORRONS_DERIVEDMESSAGE_H

@@ -7,7 +7,3 @@
 Message::SharedPtr Message::Create() {
     return Message::SharedPtr(new Message);
 }
-
-void Message::sayWord() {
-    std::cout<< "I am Message, my word: " << word << std::endl;
-}
