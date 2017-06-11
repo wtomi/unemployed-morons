@@ -14,18 +14,18 @@
 
 TEST_CASE("Sending and receiving packets", "[monitor]") {
 
-    Monitor monitor;
+    auto monitor = Monitor::getMonitor();
 
     const int TAG = 0;
     std::string stringMessage("Hello!");
     auto stringStreamMessage = std::make_shared<std::stringstream>(stringMessage);
-    if (monitor.rank == 0) {
-        for (int i = 1; i < monitor.size; i++) {
+    if (monitor->rank == 0) {
+        for (int i = 1; i < monitor->size; i++) {
             auto packet = Packet::Create(stringStreamMessage, i, TAG);
-            monitor.send(packet);
+            monitor->send(packet);
         }
     } else {
-        auto packet = monitor.receive();
+        auto packet = monitor->receive();
         REQUIRE(packet->stringstreamMessage->str().compare(stringMessage) == 0);
     }
 }
@@ -46,33 +46,35 @@ TEST_CASE("Message serializing and deserializing", "[serializer]") {
 TEST_CASE("Test Messenger", "[messenger]") {
 
     Messenger messenger;
-
     auto message = Message::Create();
     message->clock = 5;
     message->word.assign("Hello");
     message->tag = 0;
 
-    if (messenger.getRank() == 0) {
-        for (int i = 1; i < messenger.getSize(); i++) {
-            message->rank = i;
-            messenger.send(message);
+    SECTION("Simple send") {
+        if (messenger.getRank() == 0) {
+            for (int i = 1; i < messenger.getSize(); i++) {
+                message->rank = i;
+                messenger.send(message);
+            }
+        } else {
+            auto receivedMessage = messenger.receive();
+            REQUIRE(message->clock == receivedMessage->clock);
+            REQUIRE(message->word.compare(receivedMessage->word) == 0);
+            REQUIRE(message->tag == receivedMessage->tag);
         }
-    } else {
-        auto receivedMessage = messenger.receive();
-        REQUIRE(message->clock == receivedMessage->clock);
-        REQUIRE(message->word.compare(receivedMessage->word) == 0);
-        REQUIRE(message->tag == receivedMessage->tag);
     }
 
-    //Test send to all
-    messenger.sendToAll(message);
-    int numberOtherProccesses = messenger.getSize() - 1;
-    for(int i = 0; i < numberOtherProccesses; i++) {
-        auto receivedMessage = messenger.receive();
-        REQUIRE(receivedMessage->rank != messenger.getRank());
-        REQUIRE(message->clock == receivedMessage->clock);
-        REQUIRE(message->word.compare(receivedMessage->word) == 0);
-        REQUIRE(message->tag == receivedMessage->tag);
+    SECTION("Send to all") {
+        messenger.sendToAll(message);
+        int numberOtherProccesses = messenger.getSize() - 1;
+        for (int i = 0; i < numberOtherProccesses; i++) {
+            auto receivedMessage = messenger.receive();
+            REQUIRE(receivedMessage->rank != messenger.getRank());
+            REQUIRE(message->clock == receivedMessage->clock);
+            REQUIRE(message->word.compare(receivedMessage->word) == 0);
+            REQUIRE(message->tag == receivedMessage->tag);
+        }
     }
 }
 

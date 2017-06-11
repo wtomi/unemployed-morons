@@ -5,6 +5,8 @@
 #include <bits/unique_ptr.h>
 #include "Monitor.h"
 
+Monitor::SharedPtr Monitor::monitor = nullptr;
+
 Monitor::Monitor(int *argc, char ***argv, MPI_Comm mpiComm) {
     this->mpiComm = mpiComm;
     MPI_Init(argc, argv);
@@ -26,18 +28,14 @@ void Monitor::send(std::shared_ptr<std::stringstream> stringStreamMessage, int s
 }
 
 Packet::SharedPtr Monitor::receive(int source, int tag) {
-    int count = probeAndGetCount(source, tag);
+    MPI_Status probedStatus = probe(source, tag);
+    int count = getCount(probedStatus);
     std::unique_ptr<char> buffer(new char[count]);
     MPI_Status status;
-    MPI_Recv(buffer.get(), count, MPI_CHAR, source, tag, mpiComm, &status);
+    MPI_Recv(buffer.get(), count, MPI_CHAR, probedStatus.MPI_SOURCE, probedStatus.MPI_TAG, mpiComm, &status);
     auto stringstream = std::make_shared<std::stringstream>(
             std::string(buffer.get(), static_cast<unsigned long>(count)));
     return Packet::Create(stringstream, status.MPI_SOURCE, status.MPI_TAG);
-}
-
-int Monitor::probeAndGetCount(int source, int tag) {
-    MPI_Status status = probe(source, tag);
-    return getCount(status);
 }
 
 MPI_Status Monitor::probe(int source, int tag) {
@@ -52,4 +50,11 @@ int Monitor::getCount(MPI_Status &status) {
     MPI_Get_count(&status, MPI_CHAR, &count);
 
     return count;
+}
+
+Monitor::SharedPtr Monitor::getMonitor() {
+    if(monitor == nullptr) {
+        monitor = Monitor::SharedPtr(new Monitor());
+    }
+    return monitor;
 }

@@ -19,7 +19,7 @@ public:
     int getRank();
     int getSize();
 private:
-    Monitor monitor;
+    Monitor::SharedPtr monitor = Monitor::getMonitor();
 };
 
 

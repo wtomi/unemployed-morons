@@ -11,22 +11,25 @@
 
 class Monitor {
 public:
+    typedef std::shared_ptr<Monitor> SharedPtr;
+    static SharedPtr monitor;
     static const int ANY_SOURCE = MPI_ANY_SOURCE;
     static const int ANY_TAG = MPI_ANY_TAG;
     int rank;
     int size;
     MPI_Comm mpiComm;
 
-    Monitor(int *argc = nullptr, char ***argv = nullptr, MPI_Comm mpiComm = MPI_COMM_WORLD);
+    static SharedPtr getMonitor();
     ~Monitor();
 
     void send(Packet::SharedPtr package);
     void send(std::shared_ptr<std::stringstream> stringStreamMessage, int source, int tag);
     Packet::SharedPtr receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
-    int probeAndGetCount(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int getCount(MPI_Status &status);
-};
 
+private:
+    Monitor(int *argc = nullptr, char ***argv = nullptr, MPI_Comm mpiComm = MPI_COMM_WORLD);
+};
 
 #endif //UNEMPLOYED_MORRONS_MONITOR_H

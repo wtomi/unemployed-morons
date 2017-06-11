@@ -17,7 +17,7 @@ void Messenger::sendToAll(Message::SharedPtr message) {
 void Messenger::send(Message::SharedPtr message) {
     auto stringstreamMsg = Serializer::serialize(message);
     auto packet = Packet::Create(stringstreamMsg, message->rank, message->tag);
-    monitor.send(packet);
+    monitor->send(packet);
 }
 
 Message::SharedPtr Messenger::receive() {
@@ -25,7 +25,7 @@ Message::SharedPtr Messenger::receive() {
 }
 
 Message::SharedPtr Messenger::receive(int source, int tag) {
-    auto packet = monitor.receive(source, tag);
+    auto packet = monitor->receive(source, tag);
     auto message = Serializer::deserialize(packet->stringstreamMessage);
     message->rank = packet->rank;
     message->tag = packet->tag;
@@ -33,9 +33,9 @@ Message::SharedPtr Messenger::receive(int source, int tag) {
 }
 
 int Messenger::getRank() {
-    return monitor.rank;
+    return monitor->rank;
 }
 
 int Messenger::getSize() {
-    return monitor.size;
+    return monitor->size;
 }
