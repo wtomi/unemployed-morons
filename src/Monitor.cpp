@@ -22,7 +22,7 @@ void Monitor::send(Packet &package) {
 
 void Monitor::send(std::stringstream &stringStreamMessage, int source, int tag) {
     //add 1 because after conversion to c_str null will be added
-    int count = stringStreamMessage.str().length() + 1;
+    int count = stringStreamMessage.str().length();
     MPI_Send(stringStreamMessage.str().c_str(), count, MPI_CHAR, source, tag, mpiComm);
 }
 

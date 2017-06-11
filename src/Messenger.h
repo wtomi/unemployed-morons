@@ -9,7 +9,7 @@
 #include "Message.h"
 #include "Monitor.h"
 
-class Messanger {
+class Messenger {
 public:
     void send(Message message);
     Message receive(int source, int tag);

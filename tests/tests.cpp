@@ -7,9 +7,9 @@
 #include "../src/Monitor.h"
 #include "../src/Message.h"
 #include "../src/Serializer.h"
-#include "../src/Messanger.h"
+#include "../src/Messenger.h"
 
-TEST_CASE("Sending and receiving packets", "[send]") {
+TEST_CASE("Sending and receiving packets", "[monitor]") {
 
     Monitor monitor;
 
@@ -27,7 +27,7 @@ TEST_CASE("Sending and receiving packets", "[send]") {
     }
 }
 
-TEST_CASE("Message serializing and deserializing", "[serialize]") {
+TEST_CASE("Message serializing and deserializing", "[serializer]") {
     Message message;
     message.clock = 5;
     message.word.assign("Hello");
@@ -41,21 +41,21 @@ TEST_CASE("Message serializing and deserializing", "[serialize]") {
     REQUIRE(message.word.compare(deserializedMessage.word) == 0);
 }
 
-TEST_CASE("Test Messendeg", "[messanger]") {
+TEST_CASE("Test Messenger", "[messenger]") {
     Message message;
     message.clock = 5;
     message.word.assign("Hello");
     message.tag = 0;
 
-    Messanger messanger;
+    Messenger messenger;
 
-    if(messanger.getRank() == 0) {
-        for(int i = 1; i < messanger.getSize(); i++) {
+    if(messenger.getRank() == 0) {
+        for(int i = 1; i < messenger.getSize(); i++) {
             message.rank = i;
-            messanger.send(message);
+            messenger.send(message);
         }
     } else {
-        Message receivedMessage = messanger.receive();
+        Message receivedMessage = messenger.receive();
         REQUIRE(message.clock == receivedMessage.clock);
         REQUIRE(message.word.compare(receivedMessage.word) == 0);
     }

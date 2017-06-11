@@ -2,20 +2,20 @@
 // Created by tommy on 11.06.17.
 //
 
-#include "Messanger.h"
+#include "Messenger.h"
 #include "Serializer.h"
 
-void Messanger::send(Message message) {
+void Messenger::send(Message message) {
     std::stringstream stringstreamMsg = Serializer::serialize(message);
     Packet packet(stringstreamMsg, message.rank, message.tag);
     monitor.send(packet);
 }
 
-Message Messanger::receive() {
+Message Messenger::receive() {
     return receive(Monitor::ANY_SOURCE, Monitor::ANY_TAG);
 }
 
-Message Messanger::receive(int source, int tag) {
+Message Messenger::receive(int source, int tag) {
     Packet packet = monitor.receive(source, tag);
     Message message = Serializer::deserialize(packet.stringstreamMessage);
     message.rank = packet.rank;
@@ -23,10 +23,10 @@ Message Messanger::receive(int source, int tag) {
     return message;
 }
 
-int Messanger::getRank() {
+int Messenger::getRank() {
     return monitor.rank;
 }
 
-int Messanger::getSize() {
+int Messenger::getSize() {
     return monitor.size;
 }
