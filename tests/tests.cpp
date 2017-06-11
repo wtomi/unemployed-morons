@@ -12,6 +12,7 @@
 #include "../src/DerivedMessage.h"
 #include "../src/Configuration.h"
 #include "../src/RequestCompanyMessage.h"
+#include "../src/ReplyCompanyMessage.h"
 
 TEST_CASE("Sending and receiving packets", "[monitor]") {
 
@@ -125,12 +126,35 @@ TEST_CASE("Test request message", "[request]") {
     if(messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
-        Message::SharedPtr receivedMessage;
-        receivedMessage = messenger.receive();
+        Message::SharedPtr receivedMessage = messenger.receive();
         REQUIRE(receivedMessage->tag == requestMessage->tag);
         REQUIRE(receivedMessage->clock == requestMessage->clock);
         auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
         REQUIRE(receivedRequestMessage->companyId == requestMessage->companyId);
         REQUIRE(receivedRequestMessage->requestedPlaces == requestMessage->requestedPlaces);
     }
+}
+
+TEST_CASE("Test reply message", "[reply]") {
+    Messenger messenger;
+
+    auto replyMessage = ReplyCompanyMessage::Create();
+    replyMessage->clock = 5;
+    replyMessage->tag = 2;
+    replyMessage->wantToEnter = true;
+    replyMessage->companyId = 9;
+
+    Message::SharedPtr message = replyMessage;
+
+    if(messenger.getRank() == 0) {
+        messenger.sendToAll(message);
+    } else {
+        Message::SharedPtr receivedMessage = messenger.receive();
+        REQUIRE(receivedMessage->tag == replyMessage->tag);
+        REQUIRE(receivedMessage->clock == replyMessage->clock);
+        auto receivedReplyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(receivedMessage);
+        REQUIRE(receivedReplyMessage->companyId == replyMessage->companyId);
+        REQUIRE(receivedReplyMessage->wantToEnter == replyMessage->wantToEnter);
+    }
+
 }
