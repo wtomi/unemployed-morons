@@ -18,12 +18,12 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
     std::stringstream stringStreamMessage(stringMessage);
     if(monitor.rank == 0) {
         for(int i = 1; i < monitor.size; i++) {
-            Packet package(stringStreamMessage, i, TAG);
-            monitor.send(package);
+            auto packet = Packet::Create(stringStreamMessage, i, TAG);
+            monitor.send(packet);
         }
     } else {
-        Packet aPackage = monitor.receive();
-        REQUIRE(aPackage.stringstreamMessage.str().compare(stringMessage) == 0);
+        auto packet = monitor.receive();
+        REQUIRE(packet->stringstreamMessage.str().compare(stringMessage) == 0);
     }
 }
 

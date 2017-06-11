@@ -7,7 +7,7 @@
 
 void Messenger::send(Message::SharedPtr message) {
     std::stringstream stringstreamMsg = Serializer::serialize(message);
-    Packet packet(stringstreamMsg, message->rank, message->tag);
+    auto packet = Packet::Create(stringstreamMsg, message->rank, message->tag);
     monitor.send(packet);
 }
 
@@ -16,10 +16,10 @@ Message::SharedPtr Messenger::receive() {
 }
 
 Message::SharedPtr Messenger::receive(int source, int tag) {
-    Packet packet = monitor.receive(source, tag);
-    auto message = Serializer::deserialize(packet.stringstreamMessage);
-    message->rank = packet.rank;
-    message->tag = packet.tag;
+    auto packet = monitor.receive(source, tag);
+    auto message = Serializer::deserialize(packet->stringstreamMessage);
+    message->rank = packet->rank;
+    message->tag = packet->tag;
     return message;
 }
 

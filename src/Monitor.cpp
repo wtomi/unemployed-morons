@@ -16,23 +16,23 @@ Monitor::~Monitor() {
     MPI_Finalize();
 }
 
-void Monitor::send(Packet &package) {
-    send(package.stringstreamMessage, package.rank, package.tag);
+void Monitor::send(Packet::SharedPtr package) {
+    send(package->stringstreamMessage, package->rank, package->tag);
 }
 
 void Monitor::send(std::stringstream &stringStreamMessage, int source, int tag) {
     //add 1 because after conversion to c_str null will be added
-    int count = stringStreamMessage.str().length();
+    int count = static_cast<int>(stringStreamMessage.str().length());
     MPI_Send(stringStreamMessage.str().c_str(), count, MPI_CHAR, source, tag, mpiComm);
 }
 
-Packet Monitor::receive(int source, int tag) {
+Packet::SharedPtr Monitor::receive(int source, int tag) {
     int count = probeAndGetCount(source, tag);
     std::unique_ptr<char> buffer(new char[count]);
     MPI_Status status;
     MPI_Recv(buffer.get(), count, MPI_CHAR, source, tag, mpiComm, &status);
-    std::stringstream stringstream(std::string(buffer.get(), count));
-    return Packet(stringstream, status.MPI_SOURCE, status.MPI_TAG);
+    std::stringstream stringstream(std::string(buffer.get(), static_cast<unsigned long>(count)));
+    return Packet::Create(stringstream, status.MPI_SOURCE, status.MPI_TAG);
 }
 
 int Monitor::probeAndGetCount(int source, int tag) {

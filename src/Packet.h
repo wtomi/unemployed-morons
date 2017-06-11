@@ -7,22 +7,20 @@
 
 
 #include <sstream>
+#include <memory>
 
 class Packet {
 public:
+    typedef std::shared_ptr<Packet> SharedPtr;
+
     int rank;
     int tag;
     std::stringstream stringstreamMessage;
 
-    Packet(const std::stringstream &stringstreamMessage, int rank, int tag) {
-        this->rank = rank;
-        this->tag = tag;
-        this->stringstreamMessage = std::stringstream(stringstreamMessage.str());
-    }
+    static Packet::SharedPtr Create(const std::stringstream &stringstreamMessage, int rank, int tag);
 
-    Packet(const Packet &aPackage) {
-        Packet(aPackage.stringstreamMessage, aPackage.rank, aPackage.tag);
-    }
+private:
+    Packet(const std::stringstream &stringstreamMessage, int rank, int tag);
 };
 
 

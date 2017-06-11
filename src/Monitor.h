@@ -20,9 +20,9 @@ public:
     Monitor(int *argc = nullptr, char ***argv = nullptr, MPI_Comm mpiComm = MPI_COMM_WORLD);
     ~Monitor();
 
-    void send(Packet &package);
+    void send(Packet::SharedPtr package);
     void send(std::stringstream &stringStreamMessage, int source, int tag);
-    Packet receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
+    Packet::SharedPtr receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int probeAndGetCount(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int getCount(MPI_Status &status);
