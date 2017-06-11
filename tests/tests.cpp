@@ -104,11 +104,11 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
 }
 
 TEST_CASE("Test configuration", "[configuration]") {
-    Configuration configuration("config.json");
+    auto configuration = Configuration::Create("config.json");
     int maxDamageLevels[] = {10, 15};
     int maxNumberOfMorons[] = {8, 12};
-    REQUIRE(configuration.initialMoronsNumberPerAgent == 10);
-    auto &companies = configuration.companies;
+    REQUIRE(configuration->initialMoronsNumberPerAgent == 10);
+    auto &companies = configuration->companies;
     for (int i = 0; i < companies.size(); i++) {
         REQUIRE(maxDamageLevels[i] == companies[i].maxDamageLevel);
         REQUIRE(maxNumberOfMorons[i] == companies[i].maxMorons);

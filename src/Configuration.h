@@ -12,6 +12,8 @@
 
 class Configuration {
 public:
+    typedef std::shared_ptr<Configuration> SharedPtr;
+
     class Company {
     public:
         int maxDamageLevel;
@@ -23,10 +25,13 @@ public:
         }
     };
 
-    Configuration(std::string filepath);
+    static SharedPtr Create(std::string filepath);
 
     int initialMoronsNumberPerAgent;
     std::vector<Company> companies;
+private:
+    friend class cereal::access;
+    Configuration(std::string filepath);
 
     template<class Archive>
     void serialize(Archive &archive) {

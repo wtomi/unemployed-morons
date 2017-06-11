@@ -9,3 +9,7 @@ Configuration::Configuration(std::string filepath) {
     cereal::JSONInputArchive inputArchive(inputStream);
     inputArchive(*this);
 }
+
+Configuration::SharedPtr Configuration::Create(std::string filepath) {
+    return Configuration::SharedPtr(new Configuration(filepath));
+}
