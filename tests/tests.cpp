@@ -58,7 +58,7 @@ TEST_CASE("Test Messenger", "[messenger]") {
                 messenger.send(message);
             }
         } else {
-            auto receivedMessage = messenger.receive();
+            auto receivedMessage = messenger.receiveFromAnySourceAnyTag();
             REQUIRE(message->clock == receivedMessage->clock);
             REQUIRE(message->tag == receivedMessage->tag);
             REQUIRE(message->type == receivedMessage->type);
@@ -69,7 +69,7 @@ TEST_CASE("Test Messenger", "[messenger]") {
         messenger.sendToAll(message);
         int numberOtherProccesses = messenger.getSize() - 1;
         for (int i = 0; i < numberOtherProccesses; i++) {
-            auto receivedMessage = messenger.receive();
+            auto receivedMessage = messenger.receiveFromAnySourceAnyTag();
             REQUIRE(receivedMessage->rank != messenger.getRank());
             REQUIRE(message->clock == receivedMessage->clock);
             REQUIRE(message->tag == receivedMessage->tag);
@@ -93,7 +93,7 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
             messenger.send(message);
         }
     } else {
-        Message::SharedPtr receivedMessage = messenger.receive();
+        Message::SharedPtr receivedMessage = messenger.receiveFromAnySourceAnyTag();
 
         REQUIRE(message->clock == receivedMessage->clock);
         REQUIRE(message->tag == receivedMessage->tag);
@@ -129,7 +129,7 @@ TEST_CASE("Test request message", "[request]") {
     if(messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
-        Message::SharedPtr receivedMessage = messenger.receive();
+        Message::SharedPtr receivedMessage = messenger.receiveFromAnySourceAnyTag();
         REQUIRE(receivedMessage->tag == requestMessage->tag);
         REQUIRE(receivedMessage->clock == requestMessage->clock);
         auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
@@ -142,6 +142,7 @@ TEST_CASE("Test reply message", "[reply]") {
     Messenger messenger;
 
     auto replyMessage = ReplyCompanyMessage::Create();
+    const int TAG = 2;
     replyMessage->clock = 5;
     replyMessage->tag = 2;
     replyMessage->wantToEnter = true;
@@ -152,7 +153,7 @@ TEST_CASE("Test reply message", "[reply]") {
     if(messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
-        Message::SharedPtr receivedMessage = messenger.receive();
+        Message::SharedPtr receivedMessage = messenger.receiveFromAnySource(TAG);
         REQUIRE(receivedMessage->tag == replyMessage->tag);
         REQUIRE(receivedMessage->clock == replyMessage->clock);
         auto receivedReplyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(receivedMessage);

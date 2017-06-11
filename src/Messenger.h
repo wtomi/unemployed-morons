@@ -14,7 +14,8 @@ public:
     void send(Message::SharedPtr message);
     void sendToAll(Message::SharedPtr message);
     Message::SharedPtr receive(int source, int tag);
-    Message::SharedPtr receive();
+    Message::SharedPtr receiveFromAnySource(int tag);
+    Message::SharedPtr receiveFromAnySourceAnyTag();
 
     int getRank();
     int getSize();

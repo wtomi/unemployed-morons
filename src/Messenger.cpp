@@ -20,8 +20,12 @@ void Messenger::send(Message::SharedPtr message) {
     monitor->send(packet);
 }
 
-Message::SharedPtr Messenger::receive() {
+Message::SharedPtr Messenger::receiveFromAnySourceAnyTag() {
     return receive(Monitor::ANY_SOURCE, Monitor::ANY_TAG);
+}
+
+Message::SharedPtr Messenger::receiveFromAnySource(int tag) {
+    return receive(Monitor::ANY_SOURCE, tag);
 }
 
 Message::SharedPtr Messenger::receive(int source, int tag) {
