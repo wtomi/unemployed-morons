@@ -10,6 +10,7 @@
 #include "../src/Serializer.h"
 #include "../src/Messenger.h"
 #include "../src/DerivedMessage.h"
+#include "../src/Configuration.h"
 
 TEST_CASE("Sending and receiving packets", "[monitor]") {
 
@@ -75,7 +76,7 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     Message::SharedPtr message = derivedMessage;
 
     if (messenger.getRank() == 0) {
-        for(int i = messenger.getRank(); i < messenger.getSize(); i++) {
+        for (int i = messenger.getRank(); i < messenger.getSize(); i++) {
             message->rank = i;
             messenger.send(message);
         }
@@ -89,5 +90,17 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
         auto derivedMessage = std::dynamic_pointer_cast<DerivedMessage>(message);
         auto receivedDerivedMessage = std::dynamic_pointer_cast<DerivedMessage>(receivedMessage);
         REQUIRE(derivedMessage->myword.compare(receivedDerivedMessage->myword) == 0);
+    }
+}
+
+TEST_CASE("Test configuration", "[configuration]") {
+    Configuration configuration("config.json");
+    int maxDamageLevels[] = {10, 15};
+    int maxNumberOfMorons[] = {8, 12};
+    REQUIRE(configuration.initialMoronsNumberPerAgent == 10);
+    auto &companies = configuration.companies;
+    for (int i = 0; i < companies.size(); i++) {
+        REQUIRE(maxDamageLevels[i] == companies[i].maxDamageLevel);
+        REQUIRE(maxNumberOfMorons[i] == companies[i].maxMorons);
     }
 }

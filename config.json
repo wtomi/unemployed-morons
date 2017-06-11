@@ -1,0 +1,15 @@
+{
+  "configuration": {
+    "initialMoronsNumberPerAgent": 10,
+    "companies": [
+      {
+        "maxDamageLevel": 10,
+        "maxMorons": 8
+      },
+      {
+        "maxDamageLevel": 15,
+        "maxMorons": 12
+      }
+    ]
+  }
+}
