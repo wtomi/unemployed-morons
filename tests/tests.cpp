@@ -49,6 +49,7 @@ TEST_CASE("Test Messenger", "[messenger]") {
     auto message = Message::Create();
     message->clock = 5;
     message->tag = 0;
+    message->type = 1;
 
     SECTION("Simple send") {
         if (messenger.getRank() == 0) {
@@ -60,6 +61,7 @@ TEST_CASE("Test Messenger", "[messenger]") {
             auto receivedMessage = messenger.receive();
             REQUIRE(message->clock == receivedMessage->clock);
             REQUIRE(message->tag == receivedMessage->tag);
+            REQUIRE(message->type == receivedMessage->type);
         }
     }
 
@@ -71,6 +73,7 @@ TEST_CASE("Test Messenger", "[messenger]") {
             REQUIRE(receivedMessage->rank != messenger.getRank());
             REQUIRE(message->clock == receivedMessage->clock);
             REQUIRE(message->tag == receivedMessage->tag);
+            REQUIRE(message->type == receivedMessage->type);
         }
     }
 }

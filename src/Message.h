@@ -18,6 +18,7 @@ public:
     int rank = -1;
     int tag = -1;
 
+    int type;
     long clock;
 
     static SharedPtr Create();
@@ -30,7 +31,7 @@ protected:
 
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(clock);
+        ar(clock, type);
     }
 };
 
