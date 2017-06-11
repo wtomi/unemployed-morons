@@ -63,6 +63,17 @@ TEST_CASE("Test Messenger", "[messenger]") {
         REQUIRE(message->word.compare(receivedMessage->word) == 0);
         REQUIRE(message->tag == receivedMessage->tag);
     }
+
+    //Test send to all
+    messenger.sendToAll(message);
+    int numberOtherProccesses = messenger.getSize() - 1;
+    for(int i = 0; i < numberOtherProccesses; i++) {
+        auto receivedMessage = messenger.receive();
+        REQUIRE(receivedMessage->rank != messenger.getRank());
+        REQUIRE(message->clock == receivedMessage->clock);
+        REQUIRE(message->word.compare(receivedMessage->word) == 0);
+        REQUIRE(message->tag == receivedMessage->tag);
+    }
 }
 
 TEST_CASE("Test passing derived messages", "[polymorphism]") {

@@ -5,6 +5,15 @@
 #include "Messenger.h"
 #include "Serializer.h"
 
+void Messenger::sendToAll(Message::SharedPtr message) {
+    for (int i = 0; i < getSize(); i++) {
+        if (i != getRank()) {
+            message->rank = i;
+            send(message);
+        }
+    }
+}
+
 void Messenger::send(Message::SharedPtr message) {
     auto stringstreamMsg = Serializer::serialize(message);
     auto packet = Packet::Create(stringstreamMsg, message->rank, message->tag);
