@@ -5,21 +5,21 @@
 #include "Messenger.h"
 #include "Serializer.h"
 
-void Messenger::send(Message message) {
+void Messenger::send(Message::SharedPtr message) {
     std::stringstream stringstreamMsg = Serializer::serialize(message);
-    Packet packet(stringstreamMsg, message.rank, message.tag);
+    Packet packet(stringstreamMsg, message->rank, message->tag);
     monitor.send(packet);
 }
 
-Message Messenger::receive() {
+Message::SharedPtr Messenger::receive() {
     return receive(Monitor::ANY_SOURCE, Monitor::ANY_TAG);
 }
 
-Message Messenger::receive(int source, int tag) {
+Message::SharedPtr Messenger::receive(int source, int tag) {
     Packet packet = monitor.receive(source, tag);
-    Message message = Serializer::deserialize(packet.stringstreamMessage);
-    message.rank = packet.rank;
-    message.tag = packet.tag;
+    auto message = Serializer::deserialize(packet.stringstreamMessage);
+    message->rank = packet.rank;
+    message->tag = packet.tag;
     return message;
 }
 

@@ -11,9 +11,9 @@
 
 class Messenger {
 public:
-    void send(Message message);
-    Message receive(int source, int tag);
-    Message receive();
+    void send(Message::SharedPtr message);
+    Message::SharedPtr receive(int source, int tag);
+    Message::SharedPtr receive();
 
     int getRank();
     int getSize();

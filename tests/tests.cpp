@@ -28,35 +28,34 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
 }
 
 TEST_CASE("Message serializing and deserializing", "[serializer]") {
-    Message message;
-    message.clock = 5;
-    message.word.assign("Hello");
+    auto message = Message::Create();
+    message->clock = 5;
+    message->word.assign("Hello");
 
     std::stringstream stringstream = Serializer::serialize(message);
 
-    Message deserializedMessage;
-    deserializedMessage = Serializer::deserialize(stringstream);
+    auto deserializedMessage = Serializer::deserialize(stringstream);
 
-    REQUIRE(message.clock == deserializedMessage.clock);
-    REQUIRE(message.word.compare(deserializedMessage.word) == 0);
+    REQUIRE(message->clock == deserializedMessage->clock);
+    REQUIRE(message->word.compare(deserializedMessage->word) == 0);
 }
 
 TEST_CASE("Test Messenger", "[messenger]") {
-    Message message;
-    message.clock = 5;
-    message.word.assign("Hello");
-    message.tag = 0;
+    auto message = Message::Create();
+    message->clock = 5;
+    message->word.assign("Hello");
+    message->tag = 0;
 
     Messenger messenger;
 
     if(messenger.getRank() == 0) {
         for(int i = 1; i < messenger.getSize(); i++) {
-            message.rank = i;
+            message->rank = i;
             messenger.send(message);
         }
     } else {
-        Message receivedMessage = messenger.receive();
-        REQUIRE(message.clock == receivedMessage.clock);
-        REQUIRE(message.word.compare(receivedMessage.word) == 0);
+        auto receivedMessage = messenger.receive();
+        REQUIRE(message->clock == receivedMessage->clock);
+        REQUIRE(message->word.compare(receivedMessage->word) == 0);
     }
 }

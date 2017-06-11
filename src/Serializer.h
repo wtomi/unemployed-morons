@@ -11,8 +11,8 @@
 
 class Serializer {
 public:
-    static std::stringstream serialize(Message message);
-    static Message deserialize(std::stringstream &stringstreamMsg);
+    static std::stringstream serialize(Message::SharedPtr message);
+    static Message::SharedPtr deserialize(std::stringstream &stringstreamMsg);
 };
 
 

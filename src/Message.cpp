@@ -3,3 +3,7 @@
 //
 
 #include "Message.h"
+
+Message::SharedPtr Message::Create() {
+    return Message::SharedPtr(new Message);
+}
