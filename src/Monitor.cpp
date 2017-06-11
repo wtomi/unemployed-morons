@@ -20,9 +20,9 @@ void Monitor::send(Packet::SharedPtr package) {
     send(package->stringstreamMessage, package->rank, package->tag);
 }
 
-void Monitor::send(std::stringstream &stringStreamMessage, int source, int tag) {
-    int count = static_cast<int>(stringStreamMessage.str().length());
-    MPI_Send(stringStreamMessage.str().c_str(), count, MPI_CHAR, source, tag, mpiComm);
+void Monitor::send(std::shared_ptr<std::stringstream> stringStreamMessage, int source, int tag) {
+    int count = static_cast<int>(stringStreamMessage->str().length());
+    MPI_Send(stringStreamMessage->str().c_str(), count, MPI_CHAR, source, tag, mpiComm);
 }
 
 Packet::SharedPtr Monitor::receive(int source, int tag) {
@@ -30,7 +30,8 @@ Packet::SharedPtr Monitor::receive(int source, int tag) {
     std::unique_ptr<char> buffer(new char[count]);
     MPI_Status status;
     MPI_Recv(buffer.get(), count, MPI_CHAR, source, tag, mpiComm, &status);
-    std::stringstream stringstream(std::string(buffer.get(), static_cast<unsigned long>(count)));
+    auto stringstream = std::make_shared<std::stringstream>(
+            std::string(buffer.get(), static_cast<unsigned long>(count)));
     return Packet::Create(stringstream, status.MPI_SOURCE, status.MPI_TAG);
 }
 

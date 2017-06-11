@@ -4,16 +4,16 @@
 
 #include "Serializer.h"
 
-std::stringstream Serializer::serialize(Message::SharedPtr message) {
-    std::stringstream stringstreamMsg;
-    cereal::BinaryOutputArchive outputArchive(stringstreamMsg);
+std::shared_ptr<std::stringstream> Serializer::serialize(Message::SharedPtr message) {
+    auto stringstreamMsg = std::make_shared<std::stringstream>();
+    cereal::BinaryOutputArchive outputArchive(*(stringstreamMsg.get()));
     outputArchive(message);
     return stringstreamMsg;
 }
 
-Message::SharedPtr Serializer::deserialize(std::stringstream &stringstreamMsg) {
+Message::SharedPtr Serializer::deserialize(std::shared_ptr<std::stringstream> stringstreamMsg) {
     auto message = Message::Create();
-    cereal::BinaryInputArchive inputArchive(stringstreamMsg);
+    cereal::BinaryInputArchive inputArchive(*(stringstreamMsg.get()));
     inputArchive(message);
     return message;
 }

@@ -21,7 +21,7 @@ public:
     ~Monitor();
 
     void send(Packet::SharedPtr package);
-    void send(std::stringstream &stringStreamMessage, int source, int tag);
+    void send(std::shared_ptr<std::stringstream> stringStreamMessage, int source, int tag);
     Packet::SharedPtr receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int probeAndGetCount(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);

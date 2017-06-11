@@ -15,12 +15,12 @@ public:
 
     int rank;
     int tag;
-    std::stringstream stringstreamMessage;
+    std::shared_ptr<std::stringstream> stringstreamMessage;
 
-    static Packet::SharedPtr Create(const std::stringstream &stringstreamMessage, int rank, int tag);
+    static Packet::SharedPtr Create(std::shared_ptr<std::stringstream> stringstreamMessage, int rank, int tag);
 
 private:
-    Packet(const std::stringstream &stringstreamMessage, int rank, int tag);
+    Packet(std::shared_ptr<std::stringstream> stringstreamMessage, int rank, int tag);
 };
 
 

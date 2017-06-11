@@ -17,7 +17,7 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
 
     const int TAG = 0;
     std::string stringMessage("Hello!");
-    std::stringstream stringStreamMessage(stringMessage);
+    auto stringStreamMessage = std::make_shared<std::stringstream>(stringMessage);
     if (monitor.rank == 0) {
         for (int i = 1; i < monitor.size; i++) {
             auto packet = Packet::Create(stringStreamMessage, i, TAG);
@@ -25,7 +25,7 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
         }
     } else {
         auto packet = monitor.receive();
-        REQUIRE(packet->stringstreamMessage.str().compare(stringMessage) == 0);
+        REQUIRE(packet->stringstreamMessage->str().compare(stringMessage) == 0);
     }
 }
 
@@ -34,7 +34,7 @@ TEST_CASE("Message serializing and deserializing", "[serializer]") {
     message->clock = 5;
     message->word.assign("Hello");
 
-    std::stringstream stringstream = Serializer::serialize(message);
+    auto stringstream = Serializer::serialize(message);
 
     auto deserializedMessage = Serializer::deserialize(stringstream);
 

@@ -6,7 +6,7 @@
 #include "Serializer.h"
 
 void Messenger::send(Message::SharedPtr message) {
-    std::stringstream stringstreamMsg = Serializer::serialize(message);
+    auto stringstreamMsg = Serializer::serialize(message);
     auto packet = Packet::Create(stringstreamMsg, message->rank, message->tag);
     monitor.send(packet);
 }
