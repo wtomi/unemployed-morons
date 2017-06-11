@@ -5,6 +5,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch/catch.hpp>
 #include "../src/Monitor.h"
+#include "../src/Message.h"
+#include "../src/Serializer.h"
 
 TEST_CASE("Sending and receiving packets", "[send, receive, packet]") {
 
@@ -23,4 +25,19 @@ TEST_CASE("Sending and receiving packets", "[send, receive, packet]") {
         std::cout << aPackage.stringstreamMessage.str() << "\n";
         REQUIRE(aPackage.stringstreamMessage.str().compare(stringMessage) == 0);
     }
+}
+
+TEST_CASE("Message serializing and deserializeing", "[serialize, deserialize, message, serializer]") {
+
+    Message message;
+    message.clock = 5;
+    message.word.assign("Hello");
+
+    std::stringstream stringstream = Serializer::serialize(message);
+
+    Message deserializedMessage;
+    deserializedMessage = Serializer::deserialize(stringstream);
+
+    REQUIRE(message.clock == deserializedMessage.clock);
+    REQUIRE(message.word.compare(deserializedMessage.word) == 0);
 }

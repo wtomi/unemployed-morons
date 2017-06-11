@@ -6,14 +6,16 @@
 #define UNEMPLOYED_MORRONS_MESSAGE_H
 
 #include <cereal/archives/binary.hpp>
+#include <cereal/types/string.hpp>
 
 class Message {
+public:
     long clock;
-    char word[20];
+    std::string word;
 
     template<class Archive>
-    void serialize(Archive &archive) {
-        archive(clock, word);
+    void serialize(Archive &ar) {
+        ar(clock, word);
     }
 };
 
