@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <mpi.h>
+#include "Packet.h"
 
 class Monitor {
 public:
@@ -17,8 +18,9 @@ public:
     Monitor(int *argc, char ***argv, MPI_Comm mpiComm = MPI_COMM_WORLD);
     ~Monitor();
 
-    void send(std::stringstream &stringStreamMessage, int destination, int tag);
-    std::stringstream receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
+    void send(Packet &package);
+    void send(std::stringstream &stringStreamMessage, int source, int tag);
+    Packet receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int probeAndGetCount(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int getCount(MPI_Status &status);
