@@ -8,6 +8,8 @@
 
 #include "AgentInterface.h"
 #include "Configuration.h"
+#include "Company.h"
+#include "Messenger.h"
 
 class Agent: public AgentInterface {
 public:
@@ -17,9 +19,14 @@ public:
 
 private:
     Configuration::SharedPtr configuration;
+    Messenger messenger;
+    std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
 
-    void assignNewMorrons();
+    void createCompanies();
+    void assignNewMorons();
+    void requestEntrenceToEveryCompany();
+    bool isMorronsLeft();
 };
 
 

@@ -4,15 +4,14 @@
 
 #include "Company.h"
 
-int Company::numberOfAgents = -1;
+int Company::numberOfAgents;
 
-Company::Company(int companyId, int maxNumberOfMorons) : maxNumberOfMorons(maxNumberOfMorons), companyId(companyId) {
-    for(int i = 0; i < numberOfAgents; i++) {
-        agentsRequests.push_back(nullptr);
-    }
+Company::Company(int companyId, int maxDamageLevel, int maxNumberOfMorons)
+        : maxNumberOfMorons(maxNumberOfMorons), companyId(companyId), maxDamageLevel(maxDamageLevel) {
+    agentsRequests.assign(static_cast<unsigned long>(maxNumberOfMorons), nullptr);
 }
 
-Company::SharedPtr Company::Create(int companyId, int maxNumberOfMorons, int numberOfAgents) {
+Company::SharedPtr Company::Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel, int numberOfAgents) {
     Company::numberOfAgents = numberOfAgents;
-    return Company::SharedPtr(new Company(companyId, maxNumberOfMorons));
+    return Company::SharedPtr(new Company(companyId, maxNumberOfMorons, maxNumberOfMorons));
 }
