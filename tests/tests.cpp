@@ -14,6 +14,10 @@
 #include "../src/RequestCompanyMessage.h"
 #include "../src/ReplyCompanyMessage.h"
 
+#define private public
+
+#include "../src/Agent.h"
+
 TEST_CASE("Sending and receiving packets", "[monitor]") {
 
     auto monitor = Monitor::getMonitor();
@@ -100,15 +104,26 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     }
 }
 
-TEST_CASE("Test configuration", "[configuration]") {
+TEST_CASE("Test configuration and agent", "[configuration]") {
     auto configuration = Configuration::Create("config.json");
     int maxDamageLevels[] = {10, 15};
     int maxNumberOfMorons[] = {8, 12};
-    CHECK(configuration->initialMoronsNumberPerAgent == 10);
     auto &companies = configuration->companies;
-    for (int i = 0; i < companies.size(); i++) {
-        CHECK(maxDamageLevels[i] == companies[i].maxDamageLevel);
-        CHECK(maxNumberOfMorons[i] == companies[i].maxMorons);
+
+    SECTION("Test configuration") {
+        CHECK(configuration->initialMoronsNumberPerAgent == 10);
+        for (int i = 0; i < companies.size(); i++) {
+            CHECK(maxDamageLevels[i] == companies[i].maxDamageLevel);
+            CHECK(maxNumberOfMorons[i] == companies[i].maxMorons);
+        }
+    }
+
+    SECTION("Test company initializing in Agent") {
+        Agent agent(configuration);
+        for (int i = 0; i < companies.size(); i++) {
+            CHECK(agent.companies[i]->maxDamageLevel == companies[i].maxDamageLevel);
+            CHECK(agent.companies[i]->maxNumberOfMorons == companies[i].maxMorons);
+        }
     }
 }
 
@@ -122,7 +137,7 @@ TEST_CASE("Test request message", "[request]") {
 
     Message::SharedPtr message = requestMessage;
 
-    if(messenger.getRank() == 0) {
+    if (messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
         Message::SharedPtr receivedMessage = messenger.receiveFromAnySourceAnyTag();
@@ -144,7 +159,7 @@ TEST_CASE("Test reply message", "[reply]") {
 
     Message::SharedPtr message = replyMessage;
 
-    if(messenger.getRank() == 0) {
+    if (messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
         Message::SharedPtr receivedMessage = messenger.receiveFromAnySource(TAG);

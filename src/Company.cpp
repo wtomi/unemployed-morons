@@ -13,5 +13,5 @@ Company::Company(int companyId, int maxDamageLevel, int maxNumberOfMorons)
 
 Company::SharedPtr Company::Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel, int numberOfAgents) {
     Company::numberOfAgents = numberOfAgents;
-    return Company::SharedPtr(new Company(companyId, maxNumberOfMorons, maxNumberOfMorons));
+    return Company::SharedPtr(new Company(companyId, maxDamegeLevel, maxNumberOfMorons));
 }
