@@ -11,16 +11,20 @@
 
 class Messenger {
 public:
-    void send(Message::SharedPtr message);
-    void sendToAll(Message::SharedPtr message);
+    void send(Message::SharedPtr &message);
+    void sendToAll(Message::SharedPtr &message);
     Message::SharedPtr receive(int source, int tag);
     Message::SharedPtr receiveFromAnySource(int tag);
     Message::SharedPtr receiveFromAnySourceAnyTag();
 
     int getRank();
     int getSize();
+    long getClock();
 private:
+    long clock = 0;
     Monitor::SharedPtr monitor = Monitor::getMonitor();
+
+    void sendMessage(const Message::SharedPtr &message) const;
 };
 
 

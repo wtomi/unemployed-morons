@@ -5,16 +5,24 @@
 #include "Messenger.h"
 #include "Serializer.h"
 
-void Messenger::sendToAll(Message::SharedPtr message) {
+void Messenger::sendToAll(Message::SharedPtr &message) {
+    message->clock = clock;
     for (int i = 0; i < getSize(); i++) {
         if (i != getRank()) {
             message->rank = i;
-            send(message);
+            sendMessage(message);
         }
     }
+    clock++;
 }
 
-void Messenger::send(Message::SharedPtr message) {
+void Messenger::send(Message::SharedPtr &message) {
+    message->clock = clock;
+    sendMessage(message);
+    clock++;
+}
+
+void Messenger::sendMessage(const Message::SharedPtr &message) const {
     auto stringstreamMsg = Serializer::serialize(message);
     auto packet = Packet::Create(stringstreamMsg, message->rank, message->tag);
     monitor->send(packet);
@@ -33,6 +41,12 @@ Message::SharedPtr Messenger::receive(int source, int tag) {
     auto message = Serializer::deserialize(packet->stringstreamMessage);
     message->rank = packet->rank;
     message->tag = packet->tag;
+
+    if(message->clock > clock) {
+        clock = message->clock;
+    }
+    clock++;
+
     return message;
 }
 
@@ -42,4 +56,8 @@ int Messenger::getRank() {
 
 int Messenger::getSize() {
     return monitor->size;
+}
+
+long Messenger::getClock() {
+    return clock;
 }
