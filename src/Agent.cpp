@@ -9,6 +9,7 @@
 #include "ReplyCompanyMessage.h"
 
 const int Agent::TAG = 0;
+const int Agent::SETW = 6;
 
 Agent::Agent(Configuration::SharedPtr configuration) {
     this->configuration = configuration;
@@ -63,10 +64,10 @@ void Agent::receiveAndHandleMessage() {
     auto message = messenger.receiveFromAnySource(TAG);
     switch (message->type) {
         case Message::REQUEST_COMPANY:
-            handleCompanyRequest(message, false);
+            handleCompanyRequest(message);
             break;
         case Message::REPLY_COMPANY_REQUEST:
-            handleReplyToCompanyRequest(message, false);
+            handleReplyToCompanyRequest(message);
             break;
         default:
             break;
@@ -82,7 +83,7 @@ void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
 
 void Agent::printHandleCompanyRequest(int companyId) {
     printAgentInfoHeader();
-    std::cout << "receives company request message | companyId: " << companyId << "\n";
+    std::cout << "receives company request message | companyId: " << std::setw(SETW) << companyId << "\n";
 }
 
 void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
@@ -94,7 +95,7 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
 
 void Agent::printHandleReplyToCompanyRequest(int companyId) {
     printAgentInfoHeader();
-    std::cout << "receives reply to company request | companyId: " << companyId << "\n";
+    std::cout << "receives reply to company request | companyId: " << std::setw(SETW) << companyId << "\n";
 }
 
 bool Agent::isMorronsLeft() {
@@ -102,6 +103,6 @@ bool Agent::isMorronsLeft() {
 }
 
 void Agent::printAgentInfoHeader() {
-    std::cout << "Clock: " << std::setw(6) << messenger.getClock()
-              << " | rank: " << std::setw(6) << messenger.getRank() << " | ";
+    std::cout << "Clock: " << std::setw(SETW) << messenger.getClock()
+              << " | rank: " << std::setw(SETW) << messenger.getRank() << " | ";
 }

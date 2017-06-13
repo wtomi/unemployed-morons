@@ -164,6 +164,17 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
                 }
             }
         }
+
+        SECTION("Test receive and handle message") {
+            if(messenger.getRank() == 0) {
+                agent.assignNewMorons();
+                agent.requestEntranceToEveryCompany();
+            } else {
+                for(int i = 0; i < agent.companies.size(); i++) {
+                    agent.receiveAndHandleMessage();
+                }
+            }
+        }
     }
 }
 

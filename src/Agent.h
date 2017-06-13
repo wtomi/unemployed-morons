@@ -19,6 +19,7 @@ public:
 
 private:
     static const int TAG;
+    static const int SETW;
     Configuration::SharedPtr configuration;
     Messenger messenger;
     std::vector<Company::SharedPtr> companies;
