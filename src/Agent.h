@@ -31,6 +31,8 @@ private:
     void requestEntrenceToEveryCompany();
 
     bool isMorronsLeft();
+
+    void printAgentInfoHeader();
 };
 
 

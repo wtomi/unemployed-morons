@@ -2,6 +2,8 @@
 // Created by tommy on 11.06.17.
 //
 
+#include <iomanip>
+
 #include "Agent.h"
 #include "RequestCompanyMessage.h"
 
@@ -23,16 +25,19 @@ void Agent::createCompanies() {
 
 void Agent::run() {
     assignNewMorons();
+    requestEntrenceToEveryCompany();
+
+    auto message = messenger.receiveFromAnySource(TAG);
+    switch (message->type) {
+        default:
+            break;
+    }
 
     //TODO implemnt
 }
 
 void Agent::assignNewMorons() {
     this->numberOfMoronsLeft = configuration->initialMoronsNumberPerAgent;
-}
-
-bool Agent::isMorronsLeft() {
-    return numberOfMoronsLeft > 0;
 }
 
 void Agent::requestEntrenceToEveryCompany() {
@@ -43,4 +48,13 @@ void Agent::requestEntrenceToEveryCompany() {
         auto message = std::dynamic_pointer_cast<Message>(requestMessage);
         messenger.sendToAll(message);
     }
+}
+
+bool Agent::isMorronsLeft() {
+    return numberOfMoronsLeft > 0;
+}
+
+void Agent::printAgentInfoHeader() {
+    std::cout << "Clock: " << std::setw(6) << messenger.getClock()
+              << " | rank: " << std::setw(6) << messenger.getRank();
 }

@@ -40,12 +40,14 @@ TEST_CASE("Message serializing and deserializing", "[serializer]") {
     const int TYPE = 5;
     const int TAG = 2;
     auto message = Message::Create(-1, TYPE, TAG);
+    message->clock = 12;
 
     auto stringstream = Serializer::serialize(message);
 
     auto deserializedMessage = Serializer::deserialize(stringstream);
 
     CHECK(message->type == deserializedMessage->type);
+    CHECK(message->clock == deserializedMessage->clock);
 }
 
 TEST_CASE("Test Messenger", "[messenger]") {
@@ -108,9 +110,9 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
 }
 
 TEST_CASE("Test configuration and agent", "[configuration]") {
-    auto configuration = Configuration::Create("config.json");
-    int maxDamageLevels[] = {10, 15};
-    int maxNumberOfMorons[] = {8, 12};
+    auto configuration = Configuration::Create("testconfig.json");
+    int maxDamageLevels[] = {10, 15, 10};
+    int maxNumberOfMorons[] = {8, 12, 8};
     auto &companies = configuration->companies;
 
     SECTION("Test configuration") {
@@ -132,7 +134,7 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
             }
         }
 
-        SECTION("Test request all companies in Agent") {
+        SECTION("Test request all companies") {
             agent.assignNewMorons();
             agent.requestEntrenceToEveryCompany();
             for (int i = 0; i < messenger.getSize(); i++) {
@@ -144,6 +146,25 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
                         auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
                         CHECK(receivedRequestMessage->requestedPlaces == agent.numberOfMoronsLeft);
                     }
+                }
+            }
+        }
+
+        SECTION("Test single request all companies") {
+            if (messenger.getRank() == 0) {
+                agent.assignNewMorons();
+                agent.printAgentInfoHeader();
+                std::cout << "\n";
+                agent.requestEntrenceToEveryCompany();
+                agent.printAgentInfoHeader();
+                std::cout << "\n";
+            } else {
+                for (int j = 0; j < agent.companies.size(); j++) {
+                    auto receivedMessage = messenger.receive(0, Agent::TAG);
+                    CHECK(receivedMessage->type == Message::Type::REQUEST_COMPANY);
+                    CHECK(receivedMessage->tag == Agent::TAG);
+                    auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
+                    CHECK(receivedRequestMessage->requestedPlaces == agent.numberOfMoronsLeft);
                 }
             }
         }
@@ -201,11 +222,11 @@ TEST_CASE("Test clock", "[clock]") {
             CHECK(messenger.getClock() == 2);
         } else {
             auto receivedMessage = messenger.receiveFromAnySource(TAG);
-            CHECK(receivedMessage->clock == 0);
-            CHECK(messenger.getClock() == 1);
-            receivedMessage = messenger.receiveFromAnySource(TAG);
             CHECK(receivedMessage->clock == 1);
             CHECK(messenger.getClock() == 2);
+            receivedMessage = messenger.receiveFromAnySource(TAG);
+            CHECK(receivedMessage->clock == 2);
+            CHECK(messenger.getClock() == 3);
         }
     }
 
@@ -221,12 +242,12 @@ TEST_CASE("Test clock", "[clock]") {
             CHECK(messenger.getClock() == 2);
         } else if (messenger.getRank() == 1) {
             auto receivedMessage = messenger.receiveFromAnySource(TAG);
-            CHECK(receivedMessage->clock == 0);
-            CHECK(messenger.getClock() == 1);
+            CHECK(receivedMessage->clock == 1);
+            CHECK(messenger.getClock() == 2);
         } else if (messenger.getRank() == 2) {
             auto receivedMessaage = messenger.receiveFromAnySource(TAG);
-            CHECK(receivedMessaage->clock == 1);
-            CHECK(messenger.getClock() == 2);
+            CHECK(receivedMessaage->clock == 2);
+            CHECK(messenger.getClock() == 3);
         }
     }
 }

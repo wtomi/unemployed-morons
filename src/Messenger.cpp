@@ -6,20 +6,20 @@
 #include "Serializer.h"
 
 void Messenger::sendToAll(Message::SharedPtr &message) {
-    message->clock = clock;
+    this->clock++;
+    message->clock = this->clock;
     for (int i = 0; i < getSize(); i++) {
         if (i != getRank()) {
             message->rank = i;
             sendMessage(message);
         }
     }
-    clock++;
 }
 
 void Messenger::send(Message::SharedPtr &message) {
-    message->clock = clock;
+    this->clock++;
+    message->clock = this->clock;
     sendMessage(message);
-    clock++;
 }
 
 void Messenger::sendMessage(const Message::SharedPtr &message) const {
@@ -43,9 +43,9 @@ Message::SharedPtr Messenger::receive(int source, int tag) {
     message->tag = packet->tag;
 
     if(message->clock > clock) {
-        clock = message->clock;
+        this->clock = message->clock;
     }
-    clock++;
+    this->clock++;
 
     return message;
 }

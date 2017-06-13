@@ -9,6 +9,10 @@
       {
         "maxDamageLevel": 15,
         "maxMorons": 12
+      },
+      {
+        "maxDamageLevel": 10,
+        "maxMorons": 8
       }
     ]
   }
