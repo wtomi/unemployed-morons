@@ -5,6 +5,8 @@
 #include "Agent.h"
 #include "RequestCompanyMessage.h"
 
+const int Agent::TAG = 0;
+
 Agent::Agent(Configuration::SharedPtr configuration) {
     this->configuration = configuration;
     createCompanies();
@@ -12,7 +14,7 @@ Agent::Agent(Configuration::SharedPtr configuration) {
 
 void Agent::createCompanies() {
     auto companies = configuration->companies;
-    for(int i = 0; i < companies.size(); i++) {
+    for (int i = 0; i < companies.size(); i++) {
         auto company = companies[i];
         auto newCompany = Company::Create(i, company.maxMorons, company.maxDamageLevel, messenger.getSize());
         this->companies.push_back(newCompany);
@@ -34,5 +36,11 @@ bool Agent::isMorronsLeft() {
 }
 
 void Agent::requestEntrenceToEveryCompany() {
-    //TODO implment
+    for (auto &company: this->companies) {
+        //any receiver can be passed as message is sent to all agents, -1 in this case
+        auto requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
+                                                            this->numberOfMoronsLeft);
+        auto message = std::dynamic_pointer_cast<Message>(requestMessage);
+        messenger.sendToAll(message);
+    }
 }

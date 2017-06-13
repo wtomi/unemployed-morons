@@ -14,19 +14,24 @@
 class Message {
 public:
     typedef std::shared_ptr<Message> SharedPtr;
+    enum Type{
+        REQUEST_COMPANY,
+        REPLY_COMPANY_REQUEST
+    };
 
-    int rank = -1;
-    int tag = -1;
+    int rank;
+    int tag;
 
     int type;
     long clock;
 
-    static SharedPtr Create();
+    static SharedPtr Create(int rank, int tag, int type);
 
     virtual void foo() {}
 
 protected:
     friend class cereal::access;
+    Message(int rank, int tag, int type);
     Message() = default;
 
     template<class Archive>

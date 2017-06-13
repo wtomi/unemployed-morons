@@ -15,11 +15,12 @@ public:
     int companyId;
     int requestedPlaces;
 
-    static SharedPtr Create();
+    static SharedPtr Create(int receiver, int tag, int companyId, int requestedPlaces);
 
 private:
     friend class cereal::access;
-    RequestCompanyMessage() : Message() {}
+    RequestCompanyMessage(): Message() {}
+    RequestCompanyMessage(int receiver, int tag, int companyId, int requestedPlaces);
 
     template<class Archive>
     void serialize(Archive &ar) {

@@ -13,10 +13,11 @@ class Company {
 public:
     typedef std::shared_ptr<Company> SharedPtr;
 
-    Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
-
     static SharedPtr Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel, int numberOfAgents);
+
+    int getCompanyId();
 private:
+    Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
     static int numberOfAgents;
     int companyId;
     int maxNumberOfMorons;

@@ -22,7 +22,7 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
 
     auto monitor = Monitor::getMonitor();
 
-    const int TAG = 0;
+    const int TAG = 1;
     std::string stringMessage("Hello!");
     auto stringStreamMessage = std::make_shared<std::stringstream>(stringMessage);
     if (monitor->rank == 0) {
@@ -31,49 +31,51 @@ TEST_CASE("Sending and receiving packets", "[monitor]") {
             monitor->send(packet);
         }
     } else {
-        auto packet = monitor->receive();
+        auto packet = monitor->receive(Monitor::ANY_SOURCE, TAG);
         CHECK(packet->stringstreamMessage->str().compare(stringMessage) == 0);
     }
 }
 
 TEST_CASE("Message serializing and deserializing", "[serializer]") {
-    auto message = Message::Create();
-    message->type = 5;
-    message->tag = 5;
+    const int TYPE = 5;
+    const int TAG = 2;
+    auto message = Message::Create(-1, TYPE, TAG);
 
     auto stringstream = Serializer::serialize(message);
 
     auto deserializedMessage = Serializer::deserialize(stringstream);
 
     CHECK(message->type == deserializedMessage->type);
-    CHECK(message->tag == message->tag);
 }
 
 TEST_CASE("Test Messenger", "[messenger]") {
 
     Messenger messenger;
-    auto message = Message::Create();
-    message->tag = 0;
-    message->type = 1;
 
     SECTION("Simple send") {
+        const int TAG = 3;
+        const int TYPE = 1;
+        auto message = Message::Create(-1, TAG, TYPE);
         if (messenger.getRank() == 0) {
             for (int i = 1; i < messenger.getSize(); i++) {
                 message->rank = i;
                 messenger.send(message);
             }
         } else {
-            auto receivedMessage = messenger.receiveFromAnySourceAnyTag();
+            auto receivedMessage = messenger.receiveFromAnySource(TAG);
             CHECK(message->tag == receivedMessage->tag);
             CHECK(message->type == receivedMessage->type);
         }
     }
 
     SECTION("Send to all") {
+        const int TAG = 4;
+        const int TYPE = 1;
+        auto message = Message::Create(-1, TAG, TYPE);
         messenger.sendToAll(message);
         int numberOtherProccesses = messenger.getSize() - 1;
         for (int i = 0; i < numberOtherProccesses; i++) {
-            auto receivedMessage = messenger.receiveFromAnySourceAnyTag();
+            auto receivedMessage = messenger.receiveFromAnySource(TAG);
             CHECK(receivedMessage->rank != messenger.getRank());
             CHECK(message->tag == receivedMessage->tag);
             CHECK(message->type == receivedMessage->type);
@@ -85,7 +87,8 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
     Messenger messenger;
 
     auto derivedMessage = DerivedMessage::Create();
-    derivedMessage->tag = 0;
+    const int TAG = 5;
+    derivedMessage->tag = TAG;
     derivedMessage->myword.assign("Hello");
     Message::SharedPtr message = derivedMessage;
 
@@ -95,7 +98,7 @@ TEST_CASE("Test passing derived messages", "[polymorphism]") {
             messenger.send(message);
         }
     } else {
-        Message::SharedPtr receivedMessage = messenger.receiveFromAnySourceAnyTag();
+        Message::SharedPtr receivedMessage = messenger.receiveFromAnySource(TAG);
 
         CHECK(message->tag == receivedMessage->tag);
         auto derivedMessage = std::dynamic_pointer_cast<DerivedMessage>(message);
@@ -118,11 +121,31 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
         }
     }
 
-    SECTION("Test company initializing in Agent") {
+    SECTION("Test Agent") {
         Agent agent(configuration);
-        for (int i = 0; i < companies.size(); i++) {
-            CHECK(agent.companies[i]->maxDamageLevel == companies[i].maxDamageLevel);
-            CHECK(agent.companies[i]->maxNumberOfMorons == companies[i].maxMorons);
+        Messenger messenger;
+
+        SECTION("Test company initializing in Agent") {
+            for (int i = 0; i < companies.size(); i++) {
+                CHECK(agent.companies[i]->maxDamageLevel == companies[i].maxDamageLevel);
+                CHECK(agent.companies[i]->maxNumberOfMorons == companies[i].maxMorons);
+            }
+        }
+
+        SECTION("Test request all companies in Agent") {
+            agent.assignNewMorons();
+            agent.requestEntrenceToEveryCompany();
+            for (int i = 0; i < messenger.getSize(); i++) {
+                if (i != messenger.getRank()) {
+                    for (int j = 0; j < agent.companies.size(); j++) {
+                        auto receivedMessage = messenger.receive(i, Agent::TAG);
+                        CHECK(receivedMessage->type == Message::Type::REQUEST_COMPANY);
+                        CHECK(receivedMessage->tag == Agent::TAG);
+                        auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
+                        CHECK(receivedRequestMessage->requestedPlaces == agent.numberOfMoronsLeft);
+                    }
+                }
+            }
         }
     }
 }
@@ -130,17 +153,15 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
 TEST_CASE("Test request message", "[request]") {
     Messenger messenger;
 
-    auto requestMessage = RequestCompanyMessage::Create();
-    requestMessage->companyId = 10;
-    requestMessage->requestedPlaces = 8;
-    requestMessage->tag = 1;
+    const int TAG = 6;
+    auto requestMessage = RequestCompanyMessage::Create(-1, TAG, 10, 8);
 
     Message::SharedPtr message = requestMessage;
 
     if (messenger.getRank() == 0) {
         messenger.sendToAll(message);
     } else {
-        Message::SharedPtr receivedMessage = messenger.receiveFromAnySourceAnyTag();
+        Message::SharedPtr receivedMessage = messenger.receiveFromAnySource(TAG);
         CHECK(receivedMessage->tag == requestMessage->tag);
         auto receivedRequestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(receivedMessage);
         CHECK(receivedRequestMessage->companyId == requestMessage->companyId);
@@ -151,11 +172,8 @@ TEST_CASE("Test request message", "[request]") {
 TEST_CASE("Test reply message", "[reply]") {
     Messenger messenger;
 
-    auto replyMessage = ReplyCompanyMessage::Create();
-    const int TAG = 2;
-    replyMessage->tag = 2;
-    replyMessage->wantToEnter = true;
-    replyMessage->companyId = 9;
+    const int TAG = 7;
+    auto replyMessage = ReplyCompanyMessage::Create(-1, TAG, 9, true);
 
     Message::SharedPtr message = replyMessage;
 
@@ -172,12 +190,11 @@ TEST_CASE("Test reply message", "[reply]") {
 
 TEST_CASE("Test clock", "[clock]") {
     Messenger messenger;
-    const int TAG = 3;
-    auto message = Message::Create();
-    message->tag = 3;
-
 
     SECTION("for sendToAll") {
+        const int TAG = 8;
+        const int TYPE = 10;
+        auto message = Message::Create(-1, TAG, TYPE);
         if (messenger.getRank() == 0) {
             messenger.sendToAll(message);
             messenger.sendToAll(message);
@@ -193,6 +210,9 @@ TEST_CASE("Test clock", "[clock]") {
     }
 
     SECTION("for send") {
+        const int TAG = 9;
+        const int TYPE = 10;
+        auto message = Message::Create(-1, TAG, TYPE);
         if (messenger.getRank() == 0) {
             message->rank = 1;
             messenger.send(message);

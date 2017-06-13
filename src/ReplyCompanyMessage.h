@@ -14,12 +14,12 @@ public:
     int companyId;
     bool wantToEnter;
 
-    static SharedPtr Create();
+    static SharedPtr Create(int receiver, int tag, int companyId, bool wantToEnter);
 
 private:
     friend class cereal::access;
-
     ReplyCompanyMessage() : Message() {}
+    ReplyCompanyMessage(int rank, int tag, int companyId, bool wantToEnter);
 
     template<class Archive>
     void serialize(Archive &ar) {
