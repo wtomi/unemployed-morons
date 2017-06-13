@@ -11,12 +11,15 @@
 class AgentRequest {
 public:
     typedef std::shared_ptr<AgentRequest> SharedPtr;
-    static SharedPtr Create();
+
+    static SharedPtr Create(int agentId, long agentClock, int numberOdMorons);
+
+    int agentId;
 
     long clock;
     int numberOfMorons;
 private:
-    AgentRequest() = default;
+    AgentRequest(int agentId, long clock, int numberOfMorons);
 };
 
 

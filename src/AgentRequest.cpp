@@ -4,6 +4,9 @@
 
 #include "AgentRequest.h"
 
-AgentRequest::SharedPtr AgentRequest::Create() {
-    return AgentRequest::SharedPtr(new AgentRequest());
+AgentRequest::SharedPtr AgentRequest::Create(int agentId, long agentClock, int numberOdMorons) {
+    return AgentRequest::SharedPtr(new AgentRequest(agentId, agentClock, numberOdMorons));
 }
+
+AgentRequest::AgentRequest(int agentId, long clock, int numberOfMorons)
+        : agentId(agentId), clock(clock), numberOfMorons(numberOfMorons) {}

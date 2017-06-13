@@ -72,12 +72,15 @@ void Agent::receiveAndHandleMessage() {
         default:
             break;
     }
+    //TODO implement
 }
 
 void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
     auto requestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(message);
+    int companyId = requestMessage->companyId;
     if (verbose)
-        printHandleCompanyRequest(requestMessage->companyId);
+        printHandleCompanyRequest(companyId);
+    companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
     //TODO implement
 }
 

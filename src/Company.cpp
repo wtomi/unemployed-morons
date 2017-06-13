@@ -2,6 +2,7 @@
 // Created by tommy on 12.06.17.
 //
 
+#include <cassert>
 #include "Company.h"
 
 int Company::numberOfAgents;
@@ -18,4 +19,12 @@ Company::SharedPtr Company::Create(int companyId, int maxNumberOfMorons, int max
 
 int Company::getCompanyId() {
     return companyId;
+}
+
+void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
+    auto &agentRequest = agentsRequests[agentId];
+    assert(agentRequest == nullptr); //otherwise the agent wants to enter second time before leaving
+    auto newAgentsRequest = AgentRequest::Create(agentId, agentClock, requestedPlaces);
+    agentsRequests[agentId] = newAgentsRequest;
+    agentsRquestQueue.push(newAgentsRequest);
 }
