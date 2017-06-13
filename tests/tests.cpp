@@ -136,7 +136,7 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
 
         SECTION("Test request all companies") {
             agent.assignNewMorons();
-            agent.requestEntrenceToEveryCompany();
+            agent.requestEntranceToEveryCompany();
             for (int i = 0; i < messenger.getSize(); i++) {
                 if (i != messenger.getRank()) {
                     for (int j = 0; j < agent.companies.size(); j++) {
@@ -153,11 +153,7 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
         SECTION("Test single request all companies") {
             if (messenger.getRank() == 0) {
                 agent.assignNewMorons();
-                agent.printAgentInfoHeader();
-                std::cout << "\n";
-                agent.requestEntrenceToEveryCompany();
-                agent.printAgentInfoHeader();
-                std::cout << "\n";
+                agent.requestEntranceToEveryCompany();
             } else {
                 for (int j = 0; j < agent.companies.size(); j++) {
                     auto receivedMessage = messenger.receive(0, Agent::TAG);

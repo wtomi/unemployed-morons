@@ -26,13 +26,27 @@ private:
 
     void createCompanies();
 
-    void assignNewMorons();
+    void assignNewMorons(bool verbose = true);
 
-    void requestEntrenceToEveryCompany();
+    void requestEntranceToEveryCompany(bool verbose = true);
 
     bool isMorronsLeft();
 
     void printAgentInfoHeader();
+
+    void printRequestEntranceToEveryCompany();
+
+    void handleCompanyRequest(Message::SharedPtr &message, bool verbose = true);
+
+    void handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose = true);
+
+    void receiveAndHandleMessage();
+
+    void printHandleCompanyRequest(int companyId);
+
+    void printHandleReplyToCompanyRequest(int companyId);
+
+    void printAssingNewMorons(int numberOfAssignedMorons);
 };
 
 
