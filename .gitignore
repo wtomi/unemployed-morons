@@ -1,5 +1,8 @@
 #CMake
-cmake-build-debug/*
+cmake-build-debug/
+
+#idea
+.idea/workspace.xml
 
 # Prerequisites
 *.d
@@ -33,3 +36,4 @@ cmake-build-debug/*
 *.exe
 *.out
 *.app
+
