@@ -27,6 +27,7 @@ private:
     int maxNumberOfMorons;
     int maxDamageLevel;
     RequestsQueue requestsQueue;
+    int numberOfReplies;
 };
 
 

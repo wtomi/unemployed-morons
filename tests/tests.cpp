@@ -201,7 +201,7 @@ TEST_CASE("Test reply message", "[reply]") {
     Messenger messenger;
 
     const int TAG = 7;
-    auto replyMessage = ReplyCompanyMessage::Create(-1, TAG, 9, true);
+    auto replyMessage = ReplyCompanyMessage::Create(-1, TAG, 9);
 
     Message::SharedPtr message = replyMessage;
 
@@ -212,7 +212,6 @@ TEST_CASE("Test reply message", "[reply]") {
         CHECK(receivedMessage->tag == replyMessage->tag);
         auto receivedReplyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(receivedMessage);
         CHECK(receivedReplyMessage->companyId == replyMessage->companyId);
-        CHECK(receivedReplyMessage->wantToEnter == replyMessage->wantToEnter);
     }
 }
 

@@ -12,18 +12,17 @@ public:
     typedef std::shared_ptr<ReplyCompanyMessage> SharedPtr;
 
     int companyId;
-    bool wantToEnter;
 
-    static SharedPtr Create(int receiver, int tag, int companyId, bool wantToEnter);
+    static SharedPtr Create(int receiver, int tag, int companyId);
 
 private:
     friend class cereal::access;
     ReplyCompanyMessage() : Message() {}
-    ReplyCompanyMessage(int rank, int tag, int companyId, bool wantToEnter);
+    ReplyCompanyMessage(int rank, int tag, int companyId);
 
     template<class Archive>
     void serialize(Archive &ar) {
-        ar(cereal::base_class<Message>(this), companyId, wantToEnter);
+        ar(cereal::base_class<Message>(this), companyId);
     }
 };
 
