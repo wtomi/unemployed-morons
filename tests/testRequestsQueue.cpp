@@ -29,10 +29,14 @@ TEST_CASE("Test Requests Queue") {
 
     SECTION("Test getNextRequest") {
         long lastClock = LONG_MIN;
+        int lastAgentId = INT_MIN;
         for (auto request = requestsQueue.getFirstRequest();
              request != nullptr; request = requestsQueue.getNextRequest()) {
             CHECK(request->clock >= lastClock);
+            if(request->clock == lastClock)
+                CHECK(request->agentId > lastAgentId);
             lastClock = request->clock;
+            lastAgentId = request->agentId;
 //            printRequest(request);
         }
     }
