@@ -5,8 +5,8 @@
 #include "RequestsQueue.h"
 
 void RequestsQueue::addRequest(AgentRequest::SharedPtr agentRequest) {
-    auto requestKey = RequestKey::SharedPtr(new RequestKey(agentRequest->agentId, agentRequest->clock));
-    orderedRequests.insert(std::pair<RequestKey::SharedPtr, AgentRequest::SharedPtr>(requestKey, agentRequest));
+    RequestKey requestKey(agentRequest->agentId, agentRequest->clock);
+    orderedRequests.insert(std::pair<RequestKey, AgentRequest::SharedPtr>(requestKey, agentRequest));
     unorderedRequests.insert(std::pair<int, AgentRequest::SharedPtr>(agentRequest->agentId, agentRequest));
 }
 
@@ -17,7 +17,7 @@ AgentRequest::SharedPtr RequestsQueue::getAgentRequest(int agentId) {
 void RequestsQueue::romoveAgentRequest(int agentId) {
     auto &request = unorderedRequests.at(agentId);
     unorderedRequests.erase(agentId);
-    auto key = RequestKey::SharedPtr(new RequestKey(agentId, request->clock));
+    RequestKey key(agentId, request->clock);
     orderedRequests.erase(key);
 }
 

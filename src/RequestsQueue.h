@@ -38,17 +38,17 @@ private:
 
     class RequestKeyComparator {
     public:
-        bool operator()(const RequestKey::SharedPtr &lhs, const RequestKey::SharedPtr &rhs) {
-            if (lhs->agentClock < rhs->agentClock) return true;
-            if (lhs->agentClock > rhs->agentClock) return false;
-            if (lhs->agentId < rhs->agentId) return true;
-            if (lhs->agentId > rhs->agentId) return false;
+        bool operator()(const RequestKey &lhs, const RequestKey &rhs) {
+            if (lhs.agentClock < rhs.agentClock) return true;
+            if (lhs.agentClock > rhs.agentClock) return false;
+            if (lhs.agentId < rhs.agentId) return true;
+            if (lhs.agentId > rhs.agentId) return false;
             assert(false);
         }
     };
 
-    std::map<RequestKey::SharedPtr, AgentRequest::SharedPtr, RequestKeyComparator>::iterator orderedRequestsIterator;
-    std::map<RequestKey::SharedPtr, AgentRequest::SharedPtr, RequestKeyComparator> orderedRequests;
+    std::map<RequestKey, AgentRequest::SharedPtr, RequestKeyComparator>::iterator orderedRequestsIterator;
+    std::map<RequestKey, AgentRequest::SharedPtr, RequestKeyComparator> orderedRequests;
     std::unordered_map<int, AgentRequest::SharedPtr> unorderedRequests;
 };
 
