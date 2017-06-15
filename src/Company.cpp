@@ -2,7 +2,6 @@
 // Created by tommy on 12.06.17.
 //
 
-#include <cassert>
 #include "Company.h"
 
 int Company::numberOfAgents;
@@ -21,5 +20,6 @@ int Company::getCompanyId() {
 }
 
 void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
-    //TODO implement
+    auto agentRequest = AgentRequest::Create(agentId, agentClock, requestedPlaces);
+    requestsQueue.addRequest(agentRequest);
 }

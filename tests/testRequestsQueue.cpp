@@ -12,9 +12,9 @@ void printRequest(AgentRequest::SharedPtr &request);
 TEST_CASE("Test Requests Queue") {
     RequestsQueue requestsQueue;
     const int NUMBER_OF_REQUESTS = 10;
-    const int clocks[] = {5, 4, 3, 0, 5, 8, 7, 1, 6, 2};
+    const int clocks[] = {5, 4, 3, 0, 5, 8, 7, 1, 5, 2};
     const int numberOfMorons[] = {1, 5, 65, 9, 7, 4, 4, 2, 3, 41};
-    for (int i = 0; i < NUMBER_OF_REQUESTS; i++) {
+    for (int i = NUMBER_OF_REQUESTS-1; i >= 0; i--) {
         auto request = AgentRequest::Create(i, clocks[i], numberOfMorons[i]);
         requestsQueue.addRequest(request);
     }
@@ -33,7 +33,7 @@ TEST_CASE("Test Requests Queue") {
              request != nullptr; request = requestsQueue.getNextRequest()) {
             CHECK(request->clock >= lastClock);
             lastClock = request->clock;
-            printRequest(request);
+//            printRequest(request);
         }
     }
 }
