@@ -60,3 +60,7 @@ void Company::updateRequest(int agentId, int numberOfRequestedPlaces) {
     assert(request->numberOfMorons <= numberOfRequestedPlaces);
     request->numberOfMorons = numberOfRequestedPlaces;
 }
+
+void Company::removeRequest(int agentId) {
+    requestsQueue.removeAgentRequest(agentId);
+}

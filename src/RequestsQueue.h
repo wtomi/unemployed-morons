@@ -17,7 +17,7 @@ public:
 
     AgentRequest::SharedPtr getAgentRequest(int agentId);
 
-    void romoveAgentRequest(int agentId);
+    void removeAgentRequest(int agentId);
 
     AgentRequest::SharedPtr getFirstRequest();
 
@@ -43,7 +43,7 @@ private:
             if (lhs.agentClock > rhs.agentClock) return false;
             if (lhs.agentId < rhs.agentId) return true;
             if (lhs.agentId > rhs.agentId) return false;
-            assert(false);
+            return false;
         }
     };
 

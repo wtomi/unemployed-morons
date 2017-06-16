@@ -12,11 +12,12 @@ class GoOutOfQueueMessage : public Message {
 public:
     typedef std::shared_ptr<GoOutOfQueueMessage> SharedPtr;
     static SharedPtr Create(int rank, int tag, int companyId);
+
+    int companyId;
 private:
     friend class cereal::access;
     GoOutOfQueueMessage(): Message() {}
     GoOutOfQueueMessage(int rank, int tag, int companyId);
-    int companyId;
 
     template<class Archive>
     void serialize(Archive &ar) {
@@ -24,5 +25,6 @@ private:
     }
 };
 
+CEREAL_REGISTER_TYPE(GoOutOfQueueMessage);
 
 #endif //UNEMPLOYED_MORRONS_GOOUTOFQUEUEMESSAGE_H

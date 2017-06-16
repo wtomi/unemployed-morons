@@ -45,13 +45,13 @@ private:
 
     void handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose = true);
 
-    bool hasAllReplies(const Company::SharedPtr, bool verbose);
+    bool hasAllReplies(const Company::SharedPtr, bool verbose = true);
 
     void tryToPlaceMoronsInCompany(Company::SharedPtr company, bool verbose = true);
 
     void receiveAndHandleMessage();
 
-    void printHandleCompanyRequest(int companyId);
+    void printHandleCompanyRequest(int companyId, int senderId, int senderClock);
 
     void printHandleReplyToCompanyRequest(int companyId);
 
@@ -64,6 +64,12 @@ private:
     void printHasAllReplies(bool hasAllReplies);
 
     void printNoPlacesInCompany(int companyId);
+
+    void sendGoOUtOfQueue(int companyId);
+
+    void freeUnusedCompanies();
+
+    void handleGoOutOfQueue(Message::SharedPtr message, bool verbose = true);
 };
 
 

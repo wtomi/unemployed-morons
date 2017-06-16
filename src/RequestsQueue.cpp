@@ -3,6 +3,7 @@
 //
 
 #include "RequestsQueue.h"
+#include <iostream>
 
 void RequestsQueue::addRequest(AgentRequest::SharedPtr agentRequest) {
     RequestKey requestKey(agentRequest->agentId, agentRequest->clock);
@@ -14,7 +15,7 @@ AgentRequest::SharedPtr RequestsQueue::getAgentRequest(int agentId) {
     return this->unorderedRequests.at(agentId);
 }
 
-void RequestsQueue::romoveAgentRequest(int agentId) {
+void RequestsQueue::removeAgentRequest(int agentId) {
     auto &request = unorderedRequests.at(agentId);
     unorderedRequests.erase(agentId);
     RequestKey key(agentId, request->clock);

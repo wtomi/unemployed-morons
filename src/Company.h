@@ -19,6 +19,8 @@ public:
 
     void addRequest(int agentId, long agentClock, int requestedPlaces);
 
+    void removeRequest(int agentId);
+
     void addReply();
 
     int getNumberOfReplies();
@@ -39,6 +41,7 @@ private:
     int companyId;
     int maxNumberOfMorons;
     int maxDamageLevel;
+
     RequestsQueue requestsQueue;
     int numberOfReplies = 0;
     int numberOfMoronsPlaced = 0;

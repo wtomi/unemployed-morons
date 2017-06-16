@@ -14,7 +14,7 @@ TEST_CASE("Test Requests Queue") {
     const int NUMBER_OF_REQUESTS = 10;
     const int clocks[] = {5, 4, 3, 0, 5, 8, 7, 1, 5, 2};
     const int numberOfMorons[] = {1, 5, 65, 9, 7, 4, 4, 2, 3, 41};
-    for (int i = NUMBER_OF_REQUESTS-1; i >= 0; i--) {
+    for (int i = NUMBER_OF_REQUESTS - 1; i >= 0; i--) {
         auto request = AgentRequest::Create(i, clocks[i], numberOfMorons[i]);
         requestsQueue.addRequest(request);
     }
@@ -33,11 +33,19 @@ TEST_CASE("Test Requests Queue") {
         for (auto request = requestsQueue.getFirstRequest();
              request != nullptr; request = requestsQueue.getNextRequest()) {
             CHECK(request->clock >= lastClock);
-            if(request->clock == lastClock)
+            if (request->clock == lastClock)
                 CHECK(request->agentId > lastAgentId);
             lastClock = request->clock;
             lastAgentId = request->agentId;
 //            printRequest(request);
+        }
+    }
+
+    SECTION("Test remove") {
+        requestsQueue.removeAgentRequest(5);
+        for (auto request = requestsQueue.getFirstRequest();
+             request != nullptr; request = requestsQueue.getNextRequest()) {
+            CHECK(request->agentId != 5);
         }
     }
 }
