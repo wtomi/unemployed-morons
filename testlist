@@ -1,0 +1,11 @@
+Sending and receiving packets
+Message serializing and deserializing
+Test Messenger
+Test passing derived messages
+Test configuration and agent
+Test request message
+Test reply message
+Test clock
+Test Company
+Test Requests Queue
+Test automessaging

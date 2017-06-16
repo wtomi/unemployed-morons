@@ -6,13 +6,13 @@
 
 #include <catch/catch.hpp>
 #include "../src/Monitor.h"
-#include "../src/Message.h"
+#include "../src/messages/Message.h"
 #include "../src/Serializer.h"
 #include "../src/Messenger.h"
-#include "../src/DerivedMessage.h"
+#include "../src/messages/DerivedMessage.h"
 #include "../src/Configuration.h"
-#include "../src/RequestCompanyMessage.h"
-#include "../src/ReplyCompanyMessage.h"
+#include "../src/messages/RequestCompanyMessage.h"
+#include "../src/messages/ReplyCompanyMessage.h"
 
 #define private public
 

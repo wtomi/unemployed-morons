@@ -5,8 +5,8 @@
 #include <iomanip>
 
 #include "Agent.h"
-#include "RequestCompanyMessage.h"
-#include "ReplyCompanyMessage.h"
+#include "messages/RequestCompanyMessage.h"
+#include "messages/ReplyCompanyMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -30,7 +30,7 @@ void Agent::run() {
     requestEntranceToEveryCompany();
     while (true) {
         receiveAndHandleMessage();
-        if(numberOfMoronsLeft == 0) {
+        if (numberOfMoronsLeft == 0) {
 
         }
     }
@@ -129,7 +129,8 @@ void Agent::printHandleReplyToCompanyRequest(int companyId) {
 bool Agent::hasAllReplies(const Company::SharedPtr company, bool verbose) {
     assert(company->getNumberOfReplies() <= (messenger.getSize() - 1));
     bool hasAllReplies = company->getNumberOfReplies() == (messenger.getSize() - 1);
-    printHasAllReplies(hasAllReplies);
+    if (verbose)
+        printHasAllReplies(hasAllReplies);
     return hasAllReplies;
 }
 

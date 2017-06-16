@@ -7,7 +7,7 @@
 
 
 #include <sstream>
-#include "Message.h"
+#include "messages/Message.h"
 
 class Serializer {
 public:

@@ -6,7 +6,7 @@
 #define UNEMPLOYED_MORRONS_MESSANGER_H
 
 
-#include "Message.h"
+#include "messages/Message.h"
 #include "Monitor.h"
 
 class Messenger {

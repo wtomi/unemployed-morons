@@ -19,7 +19,7 @@ private:
     int companyId;
 
     template<class Archive>
-    void serializa(Archive &ar) {
+    void serialize(Archive &ar) {
         ar(cereal::base_class<Message>(this), companyId);
     }
 };
