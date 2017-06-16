@@ -13,21 +13,24 @@ class Company {
 public:
     typedef std::shared_ptr<Company> SharedPtr;
 
-    static SharedPtr Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel, int numberOfAgents);
+    static SharedPtr Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel);
 
     int getCompanyId();
 
     void addRequest(int agentId, long agentClock, int requestedPlaces);
 
+    void addReply();
+
+    int getNumberOfReplies();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
 
-    static int numberOfAgents;
     int companyId;
     int maxNumberOfMorons;
     int maxDamageLevel;
     RequestsQueue requestsQueue;
-    int numberOfReplies;
+    int numberOfReplies = 0;
 };
 
 

@@ -9,7 +9,7 @@
 #include "ReplyCompanyMessage.h"
 
 const int Agent::TAG = 0;
-const int Agent::SETW = 6;
+const int Agent::NW = 6;
 
 Agent::Agent(Configuration::SharedPtr configuration) {
     this->configuration = configuration;
@@ -20,7 +20,7 @@ void Agent::createCompanies() {
     auto companies = configuration->companies;
     for (int i = 0; i < companies.size(); i++) {
         auto company = companies[i];
-        auto newCompany = Company::Create(i, company.maxMorons, company.maxDamageLevel, messenger.getSize());
+        auto newCompany = Company::Create(i, company.maxMorons, company.maxDamageLevel);
         this->companies.push_back(newCompany);
     }
 }
@@ -46,10 +46,9 @@ void Agent::printAssingNewMorons(int numberOfAssignedMorons) {
 void Agent::requestEntranceToEveryCompany(bool verbose) {
     for (auto &company: this->companies) {
         //any receiver can be passed as message is sent to all agents, -1 in this case
-        auto requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
-                                                            this->numberOfMoronsLeft);
-        auto message = std::dynamic_pointer_cast<Message>(requestMessage);
-        messenger.sendToAll(message);
+        Message::SharedPtr requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
+                                                                          this->numberOfMoronsLeft);
+        messenger.sendToAll(requestMessage);
     }
     if (verbose)
         printRequestEntranceToEveryCompany();
@@ -81,24 +80,47 @@ void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
     if (verbose)
         printHandleCompanyRequest(companyId);
     companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
-    //TODO implement
+    sendReply(requestMessage->rank, companyId);
 }
 
 void Agent::printHandleCompanyRequest(int companyId) {
     printAgentInfoHeader();
-    std::cout << "receives company request message | companyId: " << std::setw(SETW) << companyId << "\n";
+    std::cout << "receives company request message | companyId: " << std::setw(NW) << companyId << '\n';
+}
+
+void Agent::sendReply(int receiverAgentId, int companyId, bool verbose) {
+    Message::SharedPtr reply = ReplyCompanyMessage::Create(receiverAgentId, TAG, companyId);
+    messenger.send(reply);
+    if (verbose)
+        printSendReply(receiverAgentId, companyId);
+}
+
+void Agent::printSendReply(int receiverAgentId, int comapnyId) {
+    printAgentInfoHeader();
+    std::cout << "sends reply to company request receiverRank: " << std::setw(NW)
+              << " | companyId: " << std::setw(NW) << comapnyId << '\n';
 }
 
 void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
     auto replyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(message);
     if (verbose)
         printHandleReplyToCompanyRequest(replyMessage->companyId);
-    //TODO implement
+    auto company = companies[replyMessage->companyId];
+    company->addReply();
+    if (hasAllRequests(company)) {
+
+    }
+    //TODO finish implementation
 }
 
 void Agent::printHandleReplyToCompanyRequest(int companyId) {
     printAgentInfoHeader();
-    std::cout << "receives reply to company request | companyId: " << std::setw(SETW) << companyId << "\n";
+    std::cout << "receives reply to company request | companyId: " << std::setw(NW) << companyId << '\n';
+}
+
+bool Agent::hasAllRequests(const Company::SharedPtr company) {
+    assert(company->getNumberOfReplies() <= (messenger.getSize() - 1));
+    return company->getNumberOfReplies() == (messenger.getSize() - 1);
 }
 
 bool Agent::isMorronsLeft() {
@@ -106,6 +128,6 @@ bool Agent::isMorronsLeft() {
 }
 
 void Agent::printAgentInfoHeader() {
-    std::cout << "Clock: " << std::setw(SETW) << messenger.getClock()
-              << " | rank: " << std::setw(SETW) << messenger.getRank() << " | ";
+    std::cout << "Clock: " << std::setw(NW) << messenger.getClock()
+              << " | rank: " << std::setw(NW) << messenger.getRank() << " | ";
 }

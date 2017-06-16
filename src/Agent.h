@@ -19,7 +19,7 @@ public:
 
 private:
     static const int TAG;
-    static const int SETW;
+    static const int NW;
     Configuration::SharedPtr configuration;
     Messenger messenger;
     std::vector<Company::SharedPtr> companies;
@@ -39,7 +39,13 @@ private:
 
     void handleCompanyRequest(Message::SharedPtr &message, bool verbose = true);
 
+    void sendReply(int receiverAgentId, int companyId, bool verbose = true);
+
+    void printSendReply(int receiverAgentId, int comapnyId);
+
     void handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose = true);
+
+    bool hasAllRequests(const Company::SharedPtr);
 
     void receiveAndHandleMessage();
 

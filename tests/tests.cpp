@@ -174,6 +174,12 @@ TEST_CASE("Test configuration and agent", "[configuration]") {
                     agent.receiveAndHandleMessage();
                 }
             }
+
+            SECTION("Test reply to company request") {
+                if(messenger.getRank() == 0) {
+                    agent.receiveAndHandleMessage();
+                }
+            }
         }
     }
 }
