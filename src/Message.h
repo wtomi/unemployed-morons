@@ -16,7 +16,8 @@ public:
     typedef std::shared_ptr<Message> SharedPtr;
     enum Type{
         REQUEST_COMPANY,
-        REPLY_COMPANY_REQUEST
+        REPLY_COMPANY_REQUEST,
+        GO_OUT_OF_QUEUE
     };
 
     int rank;

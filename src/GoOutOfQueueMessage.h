@@ -6,8 +6,22 @@
 #define UNEMPLOYED_MORRONS_GOOUTOFQUEUEMESSAGE_H
 
 
-class GoOutOfQueueMessage {
+#include "Message.h"
 
+class GoOutOfQueueMessage : public Message {
+public:
+    typedef std::shared_ptr<GoOutOfQueueMessage> SharedPtr;
+    static SharedPtr Create(int rank, int tag, int companyId);
+private:
+    friend class cereal::access;
+    GoOutOfQueueMessage(): Message() {}
+    GoOutOfQueueMessage(int rank, int tag, int companyId);
+    int companyId;
+
+    template<class Archive>
+    void serializa(Archive &ar) {
+        ar(cereal::base_class<Message>(this), companyId);
+    }
 };
 
 
