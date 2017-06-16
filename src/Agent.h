@@ -45,7 +45,9 @@ private:
 
     void handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose = true);
 
-    bool hasAllRequests(const Company::SharedPtr);
+    bool hasAllReplies(const Company::SharedPtr);
+
+    void tryToPlaceMoronsInCompany(Company::SharedPtr company);
 
     void receiveAndHandleMessage();
 
@@ -54,6 +56,8 @@ private:
     void printHandleReplyToCompanyRequest(int companyId);
 
     void printAssingNewMorons(int numberOfAssignedMorons);
+
+    void placeMoronsInCompany(Company::SharedPtr company, int numberOfFreePlaces);
 };
 
 

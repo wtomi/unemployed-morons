@@ -23,6 +23,10 @@ public:
 
     int getNumberOfReplies();
 
+    int getNumberOfFreePlacesForAgent(int agentId);
+
+    bool isRequestChanged(int agentId, int requestedPlaces);
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
 

@@ -28,3 +28,21 @@ void Company::addReply() {
 int Company::getNumberOfReplies() {
     return numberOfReplies;
 }
+
+int Company::getNumberOfFreePlacesForAgent(int agentId) {
+    int occupiedPlaces = 0;
+    for (auto agentRequest = requestsQueue.getFirstRequest();
+         agentRequest != nullptr; agentRequest = requestsQueue.getNextRequest()) {
+        if(agentRequest->agentId == agentId)
+            break;
+        occupiedPlaces += agentRequest->numberOfMorons;
+    }
+    int placesLeft = maxNumberOfMorons - occupiedPlaces;
+    return (placesLeft >= 0) ? placesLeft : 0;
+}
+
+bool Company::isRequestChanged(int agentId, int requestedPlaces) {
+    auto request = requestsQueue.getAgentRequest(agentId);
+    assert(requestedPlaces <= request->numberOfMorons);
+    return requestedPlaces != request->numberOfMorons;
+}

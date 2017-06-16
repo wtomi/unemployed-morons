@@ -40,7 +40,8 @@ void Agent::assignNewMorons(bool verbose) {
 }
 
 void Agent::printAssingNewMorons(int numberOfAssignedMorons) {
-
+    printAgentInfoHeader();
+    std::cout << "takes new morons | numberOfMorons: " << std::setw(NW) << numberOfAssignedMorons;
 }
 
 void Agent::requestEntranceToEveryCompany(bool verbose) {
@@ -49,6 +50,8 @@ void Agent::requestEntranceToEveryCompany(bool verbose) {
         Message::SharedPtr requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
                                                                           this->numberOfMoronsLeft);
         messenger.sendToAll(requestMessage);
+
+        company->addRequest(messenger.getRank(), messenger.getClock(), numberOfMoronsLeft);
     }
     if (verbose)
         printRequestEntranceToEveryCompany();
@@ -97,7 +100,7 @@ void Agent::sendReply(int receiverAgentId, int companyId, bool verbose) {
 
 void Agent::printSendReply(int receiverAgentId, int comapnyId) {
     printAgentInfoHeader();
-    std::cout << "sends reply to company request receiverRank: " << std::setw(NW)
+    std::cout << "sends reply to company request receiverRank: " << std::setw(NW) << receiverAgentId
               << " | companyId: " << std::setw(NW) << comapnyId << '\n';
 }
 
@@ -107,8 +110,8 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
         printHandleReplyToCompanyRequest(replyMessage->companyId);
     auto company = companies[replyMessage->companyId];
     company->addReply();
-    if (hasAllRequests(company)) {
-
+    if (hasAllReplies(company)) {
+        tryToPlaceMoronsInCompany(company);
     }
     //TODO finish implementation
 }
@@ -118,9 +121,29 @@ void Agent::printHandleReplyToCompanyRequest(int companyId) {
     std::cout << "receives reply to company request | companyId: " << std::setw(NW) << companyId << '\n';
 }
 
-bool Agent::hasAllRequests(const Company::SharedPtr company) {
+bool Agent::hasAllReplies(const Company::SharedPtr company) {
     assert(company->getNumberOfReplies() <= (messenger.getSize() - 1));
     return company->getNumberOfReplies() == (messenger.getSize() - 1);
+}
+
+void Agent::tryToPlaceMoronsInCompany(Company::SharedPtr company) {
+    int numberOfFreePlaces = company->getNumberOfFreePlacesForAgent(messenger.getRank());
+    if(numberOfFreePlaces > 0) {
+        placeMoronsInCompany(company, numberOfFreePlaces);
+    }
+}
+
+void Agent::placeMoronsInCompany(Company::SharedPtr company, int numberOfFreePlaces) {
+    int numberOfTakenPlaces;
+    if(numberOfFreePlaces >= numberOfMoronsLeft)
+        numberOfTakenPlaces = numberOfMoronsLeft;
+    else
+        numberOfTakenPlaces = numberOfFreePlaces;
+    if(company->isRequestChanged(messenger.getRank(), numberOfTakenPlaces)) {
+        //TODO send message informing about taken places
+        //and update request
+    }
+    //mark that we use this company
 }
 
 bool Agent::isMorronsLeft() {
