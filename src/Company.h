@@ -27,6 +27,12 @@ public:
 
     bool isRequestChanged(int agentId, int requestedPlaces);
 
+    void updateRequest(int agentId, int numberOfRequestedPlaces);
+
+    void placeMoronsInCompany(int numberOfMoronsPlaced);
+
+    int getNumberOfMoronsPlaced();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
 
@@ -35,6 +41,7 @@ private:
     int maxDamageLevel;
     RequestsQueue requestsQueue;
     int numberOfReplies = 0;
+    int numberOfMoronsPlaced = 0;
 };
 
 

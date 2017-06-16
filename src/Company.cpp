@@ -46,3 +46,17 @@ bool Company::isRequestChanged(int agentId, int requestedPlaces) {
     assert(requestedPlaces <= request->numberOfMorons);
     return requestedPlaces != request->numberOfMorons;
 }
+
+void Company::placeMoronsInCompany(int numberOfMoronsPlaced) {
+    this->numberOfMoronsPlaced = numberOfMoronsPlaced;
+}
+
+int Company::getNumberOfMoronsPlaced() {
+    return numberOfMoronsPlaced;
+}
+
+void Company::updateRequest(int agentId, int numberOfRequestedPlaces) {
+    auto request = requestsQueue.getAgentRequest(agentId);
+    assert(request->numberOfMorons <= numberOfRequestedPlaces);
+    request->numberOfMorons = numberOfRequestedPlaces;
+}
