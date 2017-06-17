@@ -8,6 +8,7 @@
 #include "messages/RequestCompanyMessage.h"
 #include "messages/ReplyCompanyMessage.h"
 #include "messages/GoOutOfQueueMessage.h"
+#include "messages/UpdateRequestMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -92,34 +93,57 @@ void Agent::receiveAndHandleMessage() {
         case Message::GO_OUT_OF_QUEUE:
             handleGoOutOfQueue(message);
             break;
+        case Message::UPDATE_REQUEST:
+            handleUpdateRequest(message);
+            break;
         default:
             break;
     }
     //TODO implement
 }
 
-void Agent::handleGoOutOfQueue(Message::SharedPtr message, bool verbose) {
-    auto goOutMessage = std::dynamic_pointer_cast<GoOutOfQueueMessage>(message);
-    auto company = companies[goOutMessage->companyId];
-    company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
-    if (numberOfMoronsLeft > 0)
-        tryToPlaceMoronsInCompany(company, verbose);
-}
-
 void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
     auto requestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(message);
     int companyId = requestMessage->companyId;
     if (verbose)
-        printHandleCompanyRequest(companyId, 0, 0);
+        printHandleCompanyRequest(companyId, requestMessage->rank, requestMessage->clock);
     companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
     sendReply(requestMessage->rank, companyId);
 }
 
-void Agent::printHandleCompanyRequest(int companyId, int senderId, int senderClock) {
+void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
+    auto replyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(message);
+    if (verbose)
+        printHandleReplyToCompanyRequest(replyMessage->companyId);
+    auto company = companies[replyMessage->companyId];
+    company->addReply();
+    if (isMorronsLeft())
+        tryToPlaceMoronsInCompany(company);
+}
+
+void Agent::handleGoOutOfQueue(Message::SharedPtr message, bool verbose) {
+    auto goOutMessage = std::dynamic_pointer_cast<GoOutOfQueueMessage>(message);
+    auto company = companies[goOutMessage->companyId];
+    company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
+    if (isMorronsLeft())
+        tryToPlaceMoronsInCompany(company, verbose);
+}
+
+void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
+    auto updateRequestMessage = std::dynamic_pointer_cast<UpdateRequestMessage>(message);
+    auto company = companies[updateRequestMessage->companyId];
+    company->updateRequest(updateRequestMessage->rank, updateRequestMessage->requestClock,
+                           updateRequestMessage->updatedRequestedPlaces);
+    if(isMorronsLeft()) {
+        tryToPlaceMoronsInCompany(company, verbose);
+    }
+}
+
+void Agent::printHandleCompanyRequest(int companyId, int senderId, long senderClock) {
     printAgentInfoHeader();
     std::cout << "receives company request message | companyId: " << std::setw(NW) << companyId
               << " | senderId: " << std::setw(NW) << senderId
-              << "| senderClock: " << std::setw(NW) << senderClock << '\n';
+              << " | senderClock: " << std::setw(NW) << senderClock << '\n';
 }
 
 void Agent::sendReply(int receiverAgentId, int companyId, bool verbose) {
@@ -133,16 +157,6 @@ void Agent::printSendReply(int receiverAgentId, int comapnyId) {
     printAgentInfoHeader();
     std::cout << "sends reply to company request | receiverRank: " << std::setw(NW) << receiverAgentId
               << " | companyId: " << std::setw(NW) << comapnyId << '\n';
-}
-
-void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
-    auto replyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(message);
-    if (verbose)
-        printHandleReplyToCompanyRequest(replyMessage->companyId);
-    auto company = companies[replyMessage->companyId];
-    company->addReply();
-    if (numberOfMoronsLeft > 0)
-        tryToPlaceMoronsInCompany(company);
 }
 
 void Agent::printHandleReplyToCompanyRequest(int companyId) {

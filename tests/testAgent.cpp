@@ -14,7 +14,6 @@ TEST_CASE("Test agent", "[agent]") {
     } else {
         configuration = Configuration::CreateFromReceivedMessage();
     }
-    monitor->synchronize();
     Agent agent(configuration);
     agent.run();
 }

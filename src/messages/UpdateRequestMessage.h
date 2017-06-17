@@ -17,11 +17,20 @@ public:
     int updatedRequestedPlaces;
 
     SharedPtr Create(int rank, int tag, int companyId, long requestClock, int updatedRequestedPlaces);
+
 private:
     friend class cereal::access;
-    UpdateRequestMessage(): Message() {}
+
+    UpdateRequestMessage() : Message() {}
+
     UpdateRequestMessage(int rank, int tag, int companyId, long requestClock, int updatedRequestsPlaces);
+
+    template<class Archive>
+    void serialize(Archive &ar) {
+        ar(cereal::base_class<Message>(this), companyId, requestClock, updatedRequestedPlaces);
+    }
 };
 
+CEREAL_REGISTER_TYPE(UpdateRequestMessage);
 
 #endif //UNEMPLOYED_MORRONS_UPDATEREQUESTMESSAGE_H

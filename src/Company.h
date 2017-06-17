@@ -35,7 +35,7 @@ public:
 
     bool isRequestChanged(int agentId, int agentClock, int requestedPlaces);
 
-    void updateRequest(int agentId, int agentClock, int numberOfRequestedPlaces);
+    void updateRequest(int agentId, long agentClock, int numberOfRequestedPlaces);
 
     void placeMoronsInCompany(int numberOfMoronsPlaced);
 

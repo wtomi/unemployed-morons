@@ -63,7 +63,7 @@ int Company::getNumberOfMoronsPlaced() {
     return numberOfMoronsPlaced;
 }
 
-void Company::updateRequest(int agentId, int agentClock, int numberOfRequestedPlaces) {
+void Company::updateRequest(int agentId, long agentClock, int numberOfRequestedPlaces) {
     auto request = requestsQueue.getAgentRequest(agentId, agentClock);
     assert(request->numberOfMorons <= numberOfRequestedPlaces);
     request->numberOfMorons = numberOfRequestedPlaces;

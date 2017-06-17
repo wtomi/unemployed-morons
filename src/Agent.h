@@ -51,7 +51,7 @@ private:
 
     void receiveAndHandleMessage();
 
-    void printHandleCompanyRequest(int companyId, int senderId, int senderClock);
+    void printHandleCompanyRequest(int companyId, int senderId, long senderClock);
 
     void printHandleReplyToCompanyRequest(int companyId);
 
@@ -70,6 +70,8 @@ private:
     void freeUnusedCompanies();
 
     void handleGoOutOfQueue(Message::SharedPtr message, bool verbose = true);
+
+    void handleUpdateRequest(Message::SharedPtr message, bool verbose = true);
 };
 
 
