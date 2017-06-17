@@ -58,3 +58,7 @@ Monitor::SharedPtr Monitor::getMonitor() {
     }
     return monitor;
 }
+
+void Monitor::synchronize() {
+    MPI_Barrier(mpiComm);
+}

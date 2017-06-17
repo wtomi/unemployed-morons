@@ -27,6 +27,7 @@ public:
     Packet::SharedPtr receive(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     MPI_Status probe(int source = MPI_ANY_SOURCE, int tag = MPI_ANY_TAG);
     int getCount(MPI_Status &status);
+    void synchronize();
 
 private:
     Monitor(int *argc = nullptr, char ***argv = nullptr, MPI_Comm mpiComm = MPI_COMM_WORLD);

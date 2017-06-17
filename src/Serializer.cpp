@@ -12,7 +12,7 @@ std::shared_ptr<std::stringstream> Serializer::serialize(Message::SharedPtr mess
 }
 
 Message::SharedPtr Serializer::deserialize(std::shared_ptr<std::stringstream> stringstreamMsg) {
-    auto message = Message::Create(0, 0, 0);
+    Message::SharedPtr message;
     cereal::BinaryInputArchive inputArchive(*(stringstreamMsg.get()));
     inputArchive(message);
     return message;
