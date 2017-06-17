@@ -17,7 +17,8 @@ public:
     enum Type{
         REQUEST_COMPANY,
         REPLY_COMPANY_REQUEST,
-        GO_OUT_OF_QUEUE
+        GO_OUT_OF_QUEUE,
+        UPDATE_REQUEST
     };
 
     int rank;

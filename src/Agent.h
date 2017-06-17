@@ -65,7 +65,7 @@ private:
 
     void printNoPlacesInCompany(int companyId);
 
-    void sendGoOUtOfQueue(int companyId);
+    void sendGoOUtOfQueue(int companyId, long requestClock);
 
     void freeUnusedCompanies();
 

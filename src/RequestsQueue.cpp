@@ -6,20 +6,16 @@
 #include <iostream>
 
 void RequestsQueue::addRequest(AgentRequest::SharedPtr agentRequest) {
-    RequestKey requestKey(agentRequest->agentId, agentRequest->clock);
+    RequestKey requestKey(agentRequest->agentId, agentRequest->requestClock);
     orderedRequests.insert(std::pair<RequestKey, AgentRequest::SharedPtr>(requestKey, agentRequest));
-    unorderedRequests.insert(std::pair<int, AgentRequest::SharedPtr>(agentRequest->agentId, agentRequest));
 }
 
-AgentRequest::SharedPtr RequestsQueue::getAgentRequest(int agentId) {
-    return this->unorderedRequests.at(agentId);
+AgentRequest::SharedPtr RequestsQueue::getAgentRequest(int agentId, long agentClock) {
+    return this->orderedRequests.at(RequestKey(agentId, agentClock));
 }
 
-void RequestsQueue::removeAgentRequest(int agentId) {
-    auto &request = unorderedRequests.at(agentId);
-    unorderedRequests.erase(agentId);
-    RequestKey key(agentId, request->clock);
-    orderedRequests.erase(key);
+void RequestsQueue::removeAgentRequest(int agentId, long agentClock) {
+    orderedRequests.erase(RequestKey(agentId, agentClock));
 }
 
 AgentRequest::SharedPtr RequestsQueue::getFirstRequest() {

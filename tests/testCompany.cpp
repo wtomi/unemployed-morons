@@ -6,7 +6,7 @@
 #include "../src/Company.h"
 
 TEST_CASE("Test Company", "[company]") {
-    auto company = Company::Create(0, 10, 15);
+    auto company = Company::Create(0, 10, 15, 0);
 
 }
 

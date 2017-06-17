@@ -21,7 +21,7 @@ void Agent::createCompanies() {
     auto companies = configuration->companies;
     for (int i = 0; i < companies.size(); i++) {
         auto company = companies[i];
-        auto newCompany = Company::Create(i, company.maxMorons, company.maxDamageLevel);
+        auto newCompany = Company::Create(i, company.maxMorons, company.maxDamageLevel, messenger.getRank());
         this->companies.push_back(newCompany);
     }
 }
@@ -44,8 +44,9 @@ void Agent::run() {
 void Agent::freeUnusedCompanies() {
     for (auto &company: companies) {
         if (company->getNumberOfMoronsPlaced() == 0) {
-            sendGoOUtOfQueue(company->getCompanyId());
-            company->removeRequest(messenger.getRank());
+            auto request = company->getLastRequestOfCurrentAgent();
+            sendGoOUtOfQueue(company->getCompanyId(), request->requestClock);
+            company->removeLastRequestOfCurrentAgent();
         }
     }
 }
@@ -68,7 +69,7 @@ void Agent::requestEntranceToEveryCompany(bool verbose) {
                                                                           this->numberOfMoronsLeft);
         messenger.sendToAll(requestMessage);
 
-        company->addRequest(messenger.getRank(), messenger.getClock(), numberOfMoronsLeft);
+        company->addRequestOfCurrentAgent(messenger.getClock(), numberOfMoronsLeft);
     }
     if (verbose)
         printRequestEntranceToEveryCompany();
@@ -100,7 +101,7 @@ void Agent::receiveAndHandleMessage() {
 void Agent::handleGoOutOfQueue(Message::SharedPtr message, bool verbose) {
     auto goOutMessage = std::dynamic_pointer_cast<GoOutOfQueueMessage>(message);
     auto company = companies[goOutMessage->companyId];
-    company->removeRequest(goOutMessage->rank);
+    company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
     if (numberOfMoronsLeft > 0)
         tryToPlaceMoronsInCompany(company, verbose);
 }
@@ -205,7 +206,7 @@ void Agent::printAgentInfoHeader() {
               << " | rank: " << std::setw(NW) << messenger.getRank() << " | ";
 }
 
-void Agent::sendGoOUtOfQueue(int companyId) {
-    Message::SharedPtr message = GoOutOfQueueMessage::Create(-1, TAG, companyId);
+void Agent::sendGoOUtOfQueue(int companyId, long requestClock) {
+    Message::SharedPtr message = GoOutOfQueueMessage::Create(-1, TAG, companyId, requestClock);
     messenger.sendToAll(message);
 }

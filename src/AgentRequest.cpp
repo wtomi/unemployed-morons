@@ -9,4 +9,4 @@ AgentRequest::SharedPtr AgentRequest::Create(int agentId, long agentClock, int n
 }
 
 AgentRequest::AgentRequest(int agentId, long clock, int numberOfMorons)
-        : agentId(agentId), clock(clock), numberOfMorons(numberOfMorons) {}
+        : agentId(agentId), requestClock(clock), numberOfMorons(numberOfMorons) {}

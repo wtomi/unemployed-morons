@@ -16,7 +16,7 @@ public:
 
     int agentId;
 
-    long clock;
+    long requestClock;
     int numberOfMorons;
 private:
     AgentRequest(int agentId, long clock, int numberOfMorons);

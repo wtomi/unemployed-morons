@@ -13,13 +13,19 @@ class Company {
 public:
     typedef std::shared_ptr<Company> SharedPtr;
 
-    static SharedPtr Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel);
+    static SharedPtr Create(int companyId, int maxNumberOfMorons, int maxDamegeLevel, int agentId);
 
     int getCompanyId();
 
     void addRequest(int agentId, long agentClock, int requestedPlaces);
 
-    void removeRequest(int agentId);
+    void addRequestOfCurrentAgent(long agentClock, int requestedPlaces);
+
+    void removeRequest(int agentId, long agentClock);
+
+    void removeLastRequestOfCurrentAgent();
+
+    AgentRequest::SharedPtr getLastRequestOfCurrentAgent();
 
     void addReply();
 
@@ -27,22 +33,24 @@ public:
 
     int getNumberOfFreePlacesForAgent(int agentId);
 
-    bool isRequestChanged(int agentId, int requestedPlaces);
+    bool isRequestChanged(int agentId, int agentClock, int requestedPlaces);
 
-    void updateRequest(int agentId, int numberOfRequestedPlaces);
+    void updateRequest(int agentId, int agentClock, int numberOfRequestedPlaces);
 
     void placeMoronsInCompany(int numberOfMoronsPlaced);
 
     int getNumberOfMoronsPlaced();
 
 private:
-    Company(int companyId, int maxDamageLevel, int maxNumberOfMorons);
+    Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId);
 
     int companyId;
     int maxNumberOfMorons;
     int maxDamageLevel;
 
+    int agentId;
     RequestsQueue requestsQueue;
+    AgentRequest::SharedPtr lastRequest = nullptr;
     int numberOfReplies = 0;
     int numberOfMoronsPlaced = 0;
 };

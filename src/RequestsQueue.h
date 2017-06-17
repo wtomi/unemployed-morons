@@ -15,9 +15,9 @@ class RequestsQueue {
 public:
     void addRequest(AgentRequest::SharedPtr agentRequest);
 
-    AgentRequest::SharedPtr getAgentRequest(int agentId);
+    AgentRequest::SharedPtr getAgentRequest(int agentId, long agentClock);
 
-    void removeAgentRequest(int agentId);
+    void removeAgentRequest(int agentId, long agentClock);
 
     AgentRequest::SharedPtr getFirstRequest();
 
@@ -49,7 +49,6 @@ private:
 
     std::map<RequestKey, AgentRequest::SharedPtr, RequestKeyComparator>::iterator orderedRequestsIterator;
     std::map<RequestKey, AgentRequest::SharedPtr, RequestKeyComparator> orderedRequests;
-    std::unordered_map<int, AgentRequest::SharedPtr> unorderedRequests;
 };
 
 

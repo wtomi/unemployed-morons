@@ -21,8 +21,8 @@ TEST_CASE("Test Requests Queue") {
 
     SECTION("Test get AgentRequest") {
         const int AGENT_ID = 5;
-        auto request = requestsQueue.getAgentRequest(AGENT_ID);
-        CHECK(request->clock == clocks[AGENT_ID]);
+        auto request = requestsQueue.getAgentRequest(AGENT_ID, clocks[AGENT_ID]);
+        CHECK(request->requestClock == clocks[AGENT_ID]);
         CHECK(request->numberOfMorons == numberOfMorons[AGENT_ID]);
         CHECK(request->agentId == AGENT_ID);
     }
@@ -32,17 +32,18 @@ TEST_CASE("Test Requests Queue") {
         int lastAgentId = INT_MIN;
         for (auto request = requestsQueue.getFirstRequest();
              request != nullptr; request = requestsQueue.getNextRequest()) {
-            CHECK(request->clock >= lastClock);
-            if (request->clock == lastClock)
+            CHECK(request->requestClock >= lastClock);
+            if (request->requestClock == lastClock)
                 CHECK(request->agentId > lastAgentId);
-            lastClock = request->clock;
+            lastClock = request->requestClock;
             lastAgentId = request->agentId;
 //            printRequest(request);
         }
     }
 
     SECTION("Test remove") {
-        requestsQueue.removeAgentRequest(5);
+        const int AGENT_ID = 5;
+        requestsQueue.removeAgentRequest(AGENT_ID, clocks[AGENT_ID]);
         for (auto request = requestsQueue.getFirstRequest();
              request != nullptr; request = requestsQueue.getNextRequest()) {
             CHECK(request->agentId != 5);
@@ -53,7 +54,7 @@ TEST_CASE("Test Requests Queue") {
 void printRequest(AgentRequest::SharedPtr &request) {
     const int W = 3;
     std::cout << "Agent id:" << std::setw(W) << request->agentId
-              << " | clock: " << std::setw(W) << request->clock
+              << " | clock: " << std::setw(W) << request->requestClock
               << " | morons: " << std::setw(W) << request->numberOfMorons
               << "\n";
 }
