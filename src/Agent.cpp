@@ -35,6 +35,7 @@ void Agent::run() {
         receiveAndHandleMessage();
         if (numberOfMoronsLeft == 0 && !freed) {
             freeUnusedCompanies();
+            updateRequests();
             freed = true;
         }
     }
@@ -48,6 +49,16 @@ void Agent::freeUnusedCompanies() {
             auto request = company->getLastRequestOfCurrentAgent();
             sendGoOUtOfQueue(company->getCompanyId(), request->requestClock);
             company->removeLastRequestOfCurrentAgent();
+        }
+    }
+}
+
+void Agent::updateRequests() {
+    for(auto &company: companies) {
+        if(company->isChangedLastRequestOfCurrentAgent()) {
+            auto request = company->getLastRequestOfCurrentAgent();
+            sendUpdateRequest(company->getCompanyId(), request->requestClock, company->getNumberOfMoronsPlaced());
+            company->updateLastRequestOfCurrentAgent();
         }
     }
 }
@@ -222,5 +233,10 @@ void Agent::printAgentInfoHeader() {
 
 void Agent::sendGoOUtOfQueue(int companyId, long requestClock) {
     Message::SharedPtr message = GoOutOfQueueMessage::Create(-1, TAG, companyId, requestClock);
+    messenger.sendToAll(message);
+}
+
+void Agent::sendUpdateRequest(int companyId, long requestClock, int moronsPlaced) {
+    Message::SharedPtr message = UpdateRequestMessage::Create(-1, TAG, companyId, requestClock, moronsPlaced);
     messenger.sendToAll(message);
 }

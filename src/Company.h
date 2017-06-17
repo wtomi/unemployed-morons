@@ -33,9 +33,11 @@ public:
 
     int getNumberOfFreePlacesForAgent(int agentId);
 
-    bool isCahngedLastRequestOfCurrentAgent(int requestedPlaces);
+    bool isChangedLastRequestOfCurrentAgent();
 
     void updateRequest(int agentId, long agentClock, int numberOfRequestedPlaces);
+
+    void updateLastRequestOfCurrentAgent();
 
     void placeMoronsInCompany(int numberOfMoronsPlaced);
 

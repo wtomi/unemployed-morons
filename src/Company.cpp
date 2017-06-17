@@ -49,10 +49,11 @@ int Company::getNumberOfFreePlacesForAgent(int agentId) {
     return (placesLeft >= 0) ? placesLeft : 0;
 }
 
-bool Company::isCahngedLastRequestOfCurrentAgent(int requestedPlaces) {
+bool Company::isChangedLastRequestOfCurrentAgent() {
+    if(lastRequest == nullptr) return false;
     auto request = requestsQueue.getAgentRequest(lastRequest->agentId, lastRequest->requestClock);
-    assert(requestedPlaces <= request->numberOfMorons);
-    return requestedPlaces != request->numberOfMorons;
+    assert(numberOfMoronsPlaced <= request->numberOfMorons);
+    return numberOfMoronsPlaced != request->numberOfMorons;
 }
 
 void Company::placeMoronsInCompany(int numberOfMoronsPlaced) {
@@ -63,9 +64,13 @@ int Company::getNumberOfMoronsPlaced() {
     return numberOfMoronsPlaced;
 }
 
+void Company::updateLastRequestOfCurrentAgent() {
+    updateRequest(lastRequest->agentId, lastRequest->requestClock, numberOfMoronsPlaced);
+}
+
 void Company::updateRequest(int agentId, long agentClock, int numberOfRequestedPlaces) {
     auto request = requestsQueue.getAgentRequest(agentId, agentClock);
-    assert(request->numberOfMorons <= numberOfRequestedPlaces);
+    assert(request->numberOfMorons >= numberOfRequestedPlaces);
     request->numberOfMorons = numberOfRequestedPlaces;
 }
 
@@ -76,6 +81,7 @@ void Company::removeRequest(int agentId, long agentClock) {
 void Company::removeLastRequestOfCurrentAgent() {
     assert(lastRequest != nullptr);
     requestsQueue.removeAgentRequest(lastRequest->agentId, lastRequest->requestClock);
+    lastRequest = nullptr;
 }
 
 AgentRequest::SharedPtr Company::getLastRequestOfCurrentAgent() {

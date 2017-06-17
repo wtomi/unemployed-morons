@@ -16,7 +16,7 @@ public:
     long requestClock;
     int updatedRequestedPlaces;
 
-    SharedPtr Create(int rank, int tag, int companyId, long requestClock, int updatedRequestedPlaces);
+    static SharedPtr Create(int rank, int tag, int companyId, long requestClock, int updatedRequestedPlaces);
 
 private:
     friend class cereal::access;

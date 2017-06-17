@@ -72,6 +72,10 @@ private:
     void handleGoOutOfQueue(Message::SharedPtr message, bool verbose = true);
 
     void handleUpdateRequest(Message::SharedPtr message, bool verbose = true);
+
+    void updateRequests();
+
+    void sendUpdateRequest(int companyId, long requestClock, int moronsPlaced);
 };
 
 
