@@ -27,7 +27,7 @@ public:
 
     AgentRequest::SharedPtr getLastRequestOfCurrentAgent();
 
-    void addReply();
+    void addReply(long requestClock);
 
     int getNumberOfReplies();
 

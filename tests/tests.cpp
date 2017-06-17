@@ -207,7 +207,7 @@ TEST_CASE("Test reply message", "[reply]") {
     Messenger messenger;
 
     const int TAG = 7;
-    auto replyMessage = ReplyCompanyMessage::Create(-1, TAG, 9);
+    auto replyMessage = ReplyCompanyMessage::Create(-1, TAG, 9, 0);
 
     Message::SharedPtr message = replyMessage;
 

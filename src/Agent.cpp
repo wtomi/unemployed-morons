@@ -123,7 +123,7 @@ void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
     if (verbose)
         printHandleCompanyRequest(companyId, requestMessage->rank, requestMessage->clock);
     companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
-    sendReply(requestMessage->rank, companyId);
+    sendReply(requestMessage->rank, companyId, requestMessage->clock);
 }
 
 void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
@@ -131,7 +131,7 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
     if (verbose)
         printHandleReplyToCompanyRequest(replyMessage->companyId);
     auto company = companies[replyMessage->companyId];
-    company->addReply();
+    company->addReply(replyMessage->requestClock);
     if (isMorronsLeft())
         tryToPlaceMoronsInCompany(company);
 }
@@ -161,8 +161,8 @@ void Agent::printHandleCompanyRequest(int companyId, int senderId, long senderCl
               << " | senderClock: " << std::setw(NW) << senderClock << '\n';
 }
 
-void Agent::sendReply(int receiverAgentId, int companyId, bool verbose) {
-    Message::SharedPtr reply = ReplyCompanyMessage::Create(receiverAgentId, TAG, companyId);
+void Agent::sendReply(int receiverAgentId, int companyId, long requestClock, bool verbose) {
+    Message::SharedPtr reply = ReplyCompanyMessage::Create(receiverAgentId, TAG, companyId, requestClock);
     messenger.send(reply);
     if (verbose)
         printSendReply(receiverAgentId, companyId);

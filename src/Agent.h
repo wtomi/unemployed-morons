@@ -39,7 +39,7 @@ private:
 
     void handleCompanyRequest(Message::SharedPtr &message, bool verbose = true);
 
-    void sendReply(int receiverAgentId, int companyId, bool verbose = true);
+    void sendReply(int receiverAgentId, int companyId, long requestClock, bool verbose = true);
 
     void printSendReply(int receiverAgentId, int comapnyId);
 

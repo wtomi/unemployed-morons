@@ -29,8 +29,10 @@ void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
     requestsQueue.addRequest(agentRequest);
 }
 
-void Company::addReply() {
-    numberOfReplies++;
+void Company::addReply(long requestClock) {
+    if (lastRequest != nullptr)
+        if (requestClock == lastRequest->requestClock)
+            numberOfReplies++;
 }
 
 int Company::getNumberOfReplies() {

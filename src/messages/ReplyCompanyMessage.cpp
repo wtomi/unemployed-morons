@@ -4,9 +4,9 @@
 
 #include "ReplyCompanyMessage.h"
 
-ReplyCompanyMessage::SharedPtr ReplyCompanyMessage::Create(int receiver, int tag, int companyId) {
-    return ReplyCompanyMessage::SharedPtr(new ReplyCompanyMessage(receiver, tag, companyId));
+ReplyCompanyMessage::SharedPtr ReplyCompanyMessage::Create(int receiver, int tag, int companyId, long requestClock) {
+    return ReplyCompanyMessage::SharedPtr(new ReplyCompanyMessage(receiver, tag, companyId, requestClock));
 }
 
-ReplyCompanyMessage::ReplyCompanyMessage(int rank, int tag, int companyId) :
-        Message(rank, tag, Message::Type::REPLY_COMPANY_REQUEST), companyId(companyId) {}
+ReplyCompanyMessage::ReplyCompanyMessage(int rank, int tag, int companyId, long requestClock) :
+        Message(rank, tag, Message::Type::REPLY_COMPANY_REQUEST), companyId(companyId), requestClock(requestClock) {}
