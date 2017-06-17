@@ -253,7 +253,7 @@ void Agent::printFreeUnusedCompanies(int companyId, long requestClock) {
 
 void Agent::printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces) {
     printAgentInfoHeader();
-    std::cout << "updates request | companyId: " << std::setw(NW) << companyId
-              << " | reqestClock: " << std::setw(NW) << requestClock
+    std::cout << " sends message to update request | companyId: " << std::setw(NW) << companyId
+              << " | requestClock: " << std::setw(NW) << requestClock
               << " | updatedRequestedPlaces: " << std::setw(NW) << updatedRequestedPlaces << '\n';
 }

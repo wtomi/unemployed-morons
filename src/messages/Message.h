@@ -18,7 +18,8 @@ public:
         REQUEST_COMPANY,
         REPLY_COMPANY_REQUEST,
         GO_OUT_OF_QUEUE,
-        UPDATE_REQUEST
+        UPDATE_REQUEST,
+        GO_TO_SLEEP
     };
 
     int rank;
