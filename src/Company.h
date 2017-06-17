@@ -33,7 +33,7 @@ public:
 
     int getNumberOfFreePlacesForAgent(int agentId);
 
-    bool isRequestChanged(int agentId, int agentClock, int requestedPlaces);
+    bool isCahngedLastRequestOfCurrentAgent(int requestedPlaces);
 
     void updateRequest(int agentId, long agentClock, int numberOfRequestedPlaces);
 

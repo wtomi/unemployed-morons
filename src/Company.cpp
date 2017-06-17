@@ -49,8 +49,8 @@ int Company::getNumberOfFreePlacesForAgent(int agentId) {
     return (placesLeft >= 0) ? placesLeft : 0;
 }
 
-bool Company::isRequestChanged(int agentId, int agentClock, int requestedPlaces) {
-    auto request = requestsQueue.getAgentRequest(agentId, agentClock);
+bool Company::isCahngedLastRequestOfCurrentAgent(int requestedPlaces) {
+    auto request = requestsQueue.getAgentRequest(lastRequest->agentId, lastRequest->requestClock);
     assert(requestedPlaces <= request->numberOfMorons);
     return requestedPlaces != request->numberOfMorons;
 }
