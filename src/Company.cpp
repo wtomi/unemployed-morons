@@ -37,11 +37,11 @@ int Company::getNumberOfReplies() {
     return numberOfReplies;
 }
 
-int Company::getNumberOfFreePlacesForAgent(int agentId) {
-    int occupiedPlaces = 0;
+int Company::getNumberOfFreePlacesForLastRequestOfCurrentAgent() {
+    int occupiedPlaces = numberOfMoronsPlaced;
     for (auto agentRequest = requestsQueue.getFirstRequest();
          agentRequest != nullptr; agentRequest = requestsQueue.getNextRequest()) {
-        if(agentRequest->agentId == agentId)
+        if (agentRequest->agentId == lastRequest->agentId && agentRequest->requestClock == lastRequest->requestClock)
             break;
         occupiedPlaces += agentRequest->numberOfMorons;
     }
@@ -50,14 +50,14 @@ int Company::getNumberOfFreePlacesForAgent(int agentId) {
 }
 
 bool Company::isChangedLastRequestOfCurrentAgent() {
-    if(lastRequest == nullptr) return false;
+    if (lastRequest == nullptr) return false;
     auto request = requestsQueue.getAgentRequest(lastRequest->agentId, lastRequest->requestClock);
     assert(numberOfMoronsPlaced <= request->numberOfMorons);
     return numberOfMoronsPlaced != request->numberOfMorons;
 }
 
 void Company::placeMoronsInCompany(int numberOfMoronsPlaced) {
-    this->numberOfMoronsPlaced = numberOfMoronsPlaced;
+    this->numberOfMoronsPlaced += numberOfMoronsPlaced;
 }
 
 int Company::getNumberOfMoronsPlaced() {

@@ -199,7 +199,7 @@ void Agent::printHasAllReplies(bool hasAllReplies) {
 
 void Agent::tryToPlaceMoronsInCompany(Company::SharedPtr company, bool verbose) {
     if (hasAllReplies(company, verbose)) {
-        int numberOfFreePlaces = company->getNumberOfFreePlacesForAgent(messenger.getRank());
+        int numberOfFreePlaces = company->getNumberOfFreePlacesForLastRequestOfCurrentAgent();
         if (numberOfFreePlaces > 0) {
             placeMoronsInCompany(company, numberOfFreePlaces, verbose);
         } else {

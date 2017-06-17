@@ -31,7 +31,7 @@ public:
 
     int getNumberOfReplies();
 
-    int getNumberOfFreePlacesForAgent(int agentId);
+    int getNumberOfFreePlacesForLastRequestOfCurrentAgent();
 
     bool isChangedLastRequestOfCurrentAgent();
 
