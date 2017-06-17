@@ -89,4 +89,8 @@ AgentRequest::SharedPtr Company::getLastRequestOfCurrentAgent() {
     return lastRequest;
 }
 
+bool Company::isUsed() {
+    return numberOfMoronsPlaced != 0;
+}
+
 

@@ -43,6 +43,8 @@ public:
 
     int getNumberOfMoronsPlaced();
 
+    bool isUsed();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId);
 

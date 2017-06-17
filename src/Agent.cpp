@@ -33,7 +33,7 @@ void Agent::run() {
     requestEntranceToEveryCompany();
     while (true) {
         receiveAndHandleMessage();
-        if (numberOfMoronsLeft == 0 && !freed) {
+        if (!isMorronsLeft() && !freed) {
             freeUnusedCompanies();
             updateRequests();
             freed = true;
@@ -43,22 +43,26 @@ void Agent::run() {
     //TODO implemnt
 }
 
-void Agent::freeUnusedCompanies() {
+void Agent::freeUnusedCompanies(bool verbose) {
     for (auto &company: companies) {
-        if (company->getNumberOfMoronsPlaced() == 0) {
+        if (!company->isUsed()) {
             auto request = company->getLastRequestOfCurrentAgent();
             sendGoOUtOfQueue(company->getCompanyId(), request->requestClock);
             company->removeLastRequestOfCurrentAgent();
+            if (verbose)
+                printFreeUnusedCompanies(company->getCompanyId(), request->requestClock);
         }
     }
 }
 
-void Agent::updateRequests() {
-    for(auto &company: companies) {
-        if(company->isChangedLastRequestOfCurrentAgent()) {
+void Agent::updateRequests(bool verbose) {
+    for (auto &company: companies) {
+        if (company->isChangedLastRequestOfCurrentAgent()) {
             auto request = company->getLastRequestOfCurrentAgent();
             sendUpdateRequest(company->getCompanyId(), request->requestClock, company->getNumberOfMoronsPlaced());
             company->updateLastRequestOfCurrentAgent();
+            if (verbose)
+                printUpdateRequests(company->getCompanyId(), request->requestClock, company->getNumberOfMoronsPlaced());
         }
     }
 }
@@ -145,7 +149,7 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
     auto company = companies[updateRequestMessage->companyId];
     company->updateRequest(updateRequestMessage->rank, updateRequestMessage->requestClock,
                            updateRequestMessage->updatedRequestedPlaces);
-    if(isMorronsLeft()) {
+    if (isMorronsLeft()) {
         tryToPlaceMoronsInCompany(company, verbose);
     }
 }
@@ -239,4 +243,17 @@ void Agent::sendGoOUtOfQueue(int companyId, long requestClock) {
 void Agent::sendUpdateRequest(int companyId, long requestClock, int moronsPlaced) {
     Message::SharedPtr message = UpdateRequestMessage::Create(-1, TAG, companyId, requestClock, moronsPlaced);
     messenger.sendToAll(message);
+}
+
+void Agent::printFreeUnusedCompanies(int companyId, long requestClock) {
+    printAgentInfoHeader();
+    std::cout << "sends message to withdraw request request | companyId :"
+              << std::setw(NW) << companyId << " | requestClock: " << std::setw(NW) << requestClock << '\n';
+}
+
+void Agent::printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces) {
+    printAgentInfoHeader();
+    std::cout << "updates request | companyId: " << std::setw(NW) << companyId
+              << " | reqestClock: " << std::setw(NW) << requestClock
+              << " | updatedRequestedPlaces: " << std::setw(NW) << updatedRequestedPlaces << '\n';
 }

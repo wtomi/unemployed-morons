@@ -67,15 +67,19 @@ private:
 
     void sendGoOUtOfQueue(int companyId, long requestClock);
 
-    void freeUnusedCompanies();
+    void freeUnusedCompanies(bool verbose = true);
 
     void handleGoOutOfQueue(Message::SharedPtr message, bool verbose = true);
 
     void handleUpdateRequest(Message::SharedPtr message, bool verbose = true);
 
-    void updateRequests();
+    void updateRequests(bool verbose = true);
 
     void sendUpdateRequest(int companyId, long requestClock, int moronsPlaced);
+
+    void printFreeUnusedCompanies(int companyId, long requestClock);
+
+    void printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces);
 };
 
 
