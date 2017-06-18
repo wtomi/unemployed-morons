@@ -56,6 +56,8 @@ public:
 
     int getBreakCount();
 
+    int getRepairCount();
+
     void resetLastRequestOfCurrentAgent();
 
 private:

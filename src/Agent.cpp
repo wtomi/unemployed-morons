@@ -13,6 +13,7 @@
 #include "messages/GoToSleepMessage.h"
 #include "messages/WakeUpMessage.h"
 #include "messages/BreakCompanyMessage.h"
+#include "messages/RepairCompanyMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -324,6 +325,18 @@ void Agent::breakCompany(Company::SharedPtr company) {
 }
 
 void Agent::sendBreakCompanyMessage(int companyId, int breakCount) {
-    Message::SharedPtr message = BreakCompanyMessage::Create(-1, TAG, companyId, breakCount);
+    Message::SharedPtr message = BreakCompanyMessage::Create(messenger.getRank(), TAG, companyId, breakCount);
     messenger.sendToAll(message);
+    messenger.send(message); //sends to main thread
+}
+
+void Agent::repairCompany(Company::SharedPtr company) {
+    sendRepairCompanyMessage(company->getCompanyId(),company->getRepairCount());
+    company->repairCompany();
+}
+
+void Agent::sendRepairCompanyMessage(int companyId, int repairCount) {
+    Message::SharedPtr message = RepairCompanyMessage::Create(messenger.getRank(), TAG, companyId, repairCount);
+    messenger.sendToAll(message);
+    messenger.send(message); //sends to main thread
 }

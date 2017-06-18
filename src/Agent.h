@@ -103,6 +103,10 @@ private:
     void breakCompany(Company::SharedPtr company);
 
     void sendBreakCompanyMessage(int companyId, int breakCount);
+
+    void repairCompany(Company::SharedPtr company);
+
+    void sendRepairCompanyMessage(int companyId, int repairCount);
 };
 
 

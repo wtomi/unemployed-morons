@@ -131,4 +131,8 @@ int Company::getBreakCount() {
     return breakCount;
 }
 
+int Company::getRepairCount() {
+    return repairCount;
+}
+
 
