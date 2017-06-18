@@ -60,6 +60,8 @@ private:
     AgentRequest::SharedPtr lastRequest = nullptr;
     std::set<int> replies;
     int numberOfMoronsPlaced = 0;
+    int breakCount = 0;
+    int repairCount = 0;
 };
 
 
