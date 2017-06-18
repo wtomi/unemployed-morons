@@ -20,7 +20,8 @@ public:
         GO_OUT_OF_QUEUE,
         UPDATE_REQUEST,
         GO_TO_SLEEP,
-        WAKE_UP
+        WAKE_UP,
+        BREAK_COMPANY
     };
 
     int rank;
