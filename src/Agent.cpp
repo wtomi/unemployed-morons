@@ -3,12 +3,15 @@
 //
 
 #include <iomanip>
+#include <unistd.h>
 
 #include "Agent.h"
 #include "messages/RequestCompanyMessage.h"
 #include "messages/ReplyCompanyMessage.h"
 #include "messages/GoOutOfQueueMessage.h"
 #include "messages/UpdateRequestMessage.h"
+#include "messages/GoToSleepMessage.h"
+#include "messages/WakeUpMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -33,10 +36,11 @@ void Agent::run() {
     requestEntranceToEveryCompany();
     while (true) {
         receiveAndHandleMessage();
-        if (!isMorronsLeft() && !freed) {
+        if (!isMoronsLeft() && !freed) {
             freeUnusedCompanies();
             updateRequests();
             freed = true;
+            goToSleep();
         }
     }
 
@@ -111,6 +115,12 @@ void Agent::receiveAndHandleMessage() {
         case Message::UPDATE_REQUEST:
             handleUpdateRequest(message);
             break;
+        case Message::GO_TO_SLEEP:
+            handleGoToSleep(message);
+            break;
+        case Message::WAKE_UP:
+            handleWakeUp(message);
+            break;
         default:
             break;
     }
@@ -132,7 +142,7 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
         printHandleReplyToCompanyRequest(replyMessage->companyId);
     auto company = companies[replyMessage->companyId];
     company->addReply(replyMessage->requestClock);
-    if (isMorronsLeft())
+    if (isMoronsLeft())
         tryToPlaceMoronsInCompany(company);
 }
 
@@ -140,7 +150,7 @@ void Agent::handleGoOutOfQueue(Message::SharedPtr message, bool verbose) {
     auto goOutMessage = std::dynamic_pointer_cast<GoOutOfQueueMessage>(message);
     auto company = companies[goOutMessage->companyId];
     company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
-    if (isMorronsLeft())
+    if (isMoronsLeft())
         tryToPlaceMoronsInCompany(company, verbose);
 }
 
@@ -149,7 +159,7 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
     auto company = companies[updateRequestMessage->companyId];
     company->updateRequest(updateRequestMessage->rank, updateRequestMessage->requestClock,
                            updateRequestMessage->updatedRequestedPlaces);
-    if (isMorronsLeft()) {
+    if (isMoronsLeft()) {
         tryToPlaceMoronsInCompany(company, verbose);
     }
 }
@@ -226,7 +236,7 @@ void Agent::printPlaceMoronsInCompany(int companyId, int numberOfTakenPlaces) {
               << " | taken places: " << std::setw(NW) << numberOfTakenPlaces << '\n';
 }
 
-bool Agent::isMorronsLeft() {
+bool Agent::isMoronsLeft() {
     return numberOfMoronsLeft > 0;
 }
 
@@ -256,4 +266,28 @@ void Agent::printUpdateRequests(int companyId, long requestClock, int updatedReq
     std::cout << " sends message to update request | companyId: " << std::setw(NW) << companyId
               << " | requestClock: " << std::setw(NW) << requestClock
               << " | updatedRequestedPlaces: " << std::setw(NW) << updatedRequestedPlaces << '\n';
+}
+
+void Agent::goToSleep() {
+    sendGoToSleepMessage();
+    sleep(5000);
+    sendWakeUpMessage();
+}
+
+void Agent::sendGoToSleepMessage() {
+    Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
+    messenger.sendToAll(message);
+}
+
+void Agent::sendWakeUpMessage() {
+    Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
+    messenger.sendToAll(message);
+}
+
+void Agent::handleGoToSleep(Message::SharedPtr message) {
+    sleepingAgents.insert(message->rank);
+}
+
+void Agent::handleWakeUp(Message::SharedPtr message) {
+    sleepingAgents.erase(message->rank);
 }

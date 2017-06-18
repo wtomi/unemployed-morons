@@ -24,6 +24,7 @@ private:
     Messenger messenger;
     std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
+    std::set<int> sleepingAgents;
 
     void createCompanies();
 
@@ -31,7 +32,7 @@ private:
 
     void requestEntranceToEveryCompany(bool verbose = true);
 
-    bool isMorronsLeft();
+    bool isMoronsLeft();
 
     void printAgentInfoHeader();
 
@@ -80,6 +81,16 @@ private:
     void printFreeUnusedCompanies(int companyId, long requestClock);
 
     void printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces);
+
+    void goToSleep();
+
+    void sendGoToSleepMessage();
+
+    void sendWakeUpMessage();
+
+    void handleGoToSleep(Message::SharedPtr message);
+
+    void handleWakeUp(Message::SharedPtr message);
 };
 
 
