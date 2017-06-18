@@ -48,6 +48,8 @@ public:
 
     bool isUsed();
 
+    void breakCompany();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId);
 
@@ -58,8 +60,10 @@ private:
     int agentId;
     RequestsQueue requestsQueue;
     AgentRequest::SharedPtr lastRequest = nullptr;
-    std::set<int> replies;
+    std::set<int> repliesToCompanyRequest;
     int numberOfMoronsPlaced = 0;
+    bool isBroken = false;
+    std::set<int> repliesToBreakRequest;
 };
 
 

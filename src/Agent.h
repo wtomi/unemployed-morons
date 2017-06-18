@@ -99,6 +99,16 @@ private:
     void printHandleGoToSleep(int agentId);
 
     void printHandleWakeUp(int agentId);
+
+    void breakCompany(Company::SharedPtr &company);
+
+    void sendRequestBreakCompany(int companyId);
+
+    void handleRequestBreakCompany(Message::SharedPtr message);
+
+    void handleReplyBreakCompany(Message::SharedPtr message);
+
+    void handleBreakCompany(Message::SharedPtr message);
 };
 
 

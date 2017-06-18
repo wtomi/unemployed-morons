@@ -34,16 +34,16 @@ void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
 void Company::addReply(int agentId, long requestClock) {
     if (lastRequest != nullptr)
         if (requestClock == lastRequest->requestClock)
-            replies.insert(agentId);
+            repliesToCompanyRequest.insert(agentId);
 }
 
 int Company::getNumberOfReplies() {
-    return static_cast<int>(replies.size());
+    return static_cast<int>(repliesToCompanyRequest.size());
 }
 
 int Company::getNumberOfRepliesAfterSubtracting(std::set<int> sleepingAgents) {
-    std::vector<int> difference(replies.size());
-    auto it = std::set_difference(replies.begin(), replies.end(),
+    std::vector<int> difference(repliesToCompanyRequest.size());
+    auto it = std::set_difference(repliesToCompanyRequest.begin(), repliesToCompanyRequest.end(),
                                   sleepingAgents.begin(), sleepingAgents.end(), difference.begin());
     return static_cast<int>(it - difference.begin());
 }
@@ -102,6 +102,11 @@ AgentRequest::SharedPtr Company::getLastRequestOfCurrentAgent() {
 
 bool Company::isUsed() {
     return numberOfMoronsPlaced != 0;
+}
+
+void Company::breakCompany() {
+    isBroken = true;
+    //TODO implement
 }
 
 

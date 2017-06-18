@@ -12,6 +12,7 @@
 #include "messages/UpdateRequestMessage.h"
 #include "messages/GoToSleepMessage.h"
 #include "messages/WakeUpMessage.h"
+#include "messages/RequestBreakCompanyMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -120,6 +121,15 @@ void Agent::receiveAndHandleMessage() {
             break;
         case Message::WAKE_UP:
             handleWakeUp(message);
+            break;
+        case Message::REQUEST_BREAK_COMPANY:
+            handleRequestBreakCompany(message);
+            break;
+        case Message::REPLY_BREAK_COMPANY:
+            handleReplyBreakCompany(message);
+            break;
+        case Message::BREAK_COMPANY:
+            handleBreakCompany(message);
             break;
         default:
             break;
@@ -278,9 +288,9 @@ void Agent::printUpdateRequests(int companyId, long requestClock, int updatedReq
 }
 
 void Agent::goToSleep(bool verbose) {
-    sendGoToSleepMessage();
+    sendGoToSleepMessage(verbose);
     sleep(20);
-    sendWakeUpMessage();
+    sendWakeUpMessage(verbose);
 }
 
 void Agent::sendGoToSleepMessage(bool verbose) {
@@ -315,4 +325,26 @@ void Agent::printHandleGoToSleep(int agentId) {
 void Agent::printHandleWakeUp(int agentId) {
     printAgentInfoHeader();
     std::cout << "removes from sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
+}
+
+void Agent::breakCompany(Company::SharedPtr &company) {
+    sendRequestBreakCompany(company->getCompanyId());
+    company->breakCompany();
+}
+
+void Agent::sendRequestBreakCompany(int companyId) {
+    Message::SharedPtr message = RequestBreakCompanyMessage::Create(-1, TAG, companyId);
+    messenger.sendToAll(message);
+}
+
+void Agent::handleRequestBreakCompany(Message::SharedPtr message) {
+
+}
+
+void Agent::handleReplyBreakCompany(Message::SharedPtr message) {
+
+}
+
+void Agent::handleBreakCompany(Message::SharedPtr message) {
+
 }
