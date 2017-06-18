@@ -36,11 +36,6 @@ void Agent::run() {
     bool freed = false;
     assignNewMorons();
     requestEntranceToEveryCompany();
-    if (messenger.getRank() == 1) {
-        breakCompany(companies[0]);
-        goToSleep();
-        repairCompany(companies[0]);
-    }
     while (true) {
         receiveAndHandleMessage();
         if (!isMoronsLeft() && !freed) {
