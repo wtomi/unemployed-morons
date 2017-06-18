@@ -82,15 +82,23 @@ private:
 
     void printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces);
 
-    void goToSleep(bool verbose);
+    void goToSleep(bool verbose = true);
 
-    void sendGoToSleepMessage(bool verbose);
+    void sendGoToSleepMessage(bool verbose = true);
 
-    void sendWakeUpMessage(bool verbose);
+    void sendWakeUpMessage(bool verbose = true);
 
-    void handleGoToSleep(Message::SharedPtr message, bool verbose);
+    void handleGoToSleep(Message::SharedPtr message, bool verbose = true);
 
-    void handleWakeUp(Message::SharedPtr message, bool verbose);
+    void handleWakeUp(Message::SharedPtr message, bool verbose = true);
+
+    void printSendGoToSleep();
+
+    void printSendWakeUp();
+
+    void printHandleGoToSleep(int agentId);
+
+    void printHandleWakeUp(int agentId);
 };
 
 

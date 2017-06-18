@@ -40,7 +40,7 @@ void Agent::run() {
             freeUnusedCompanies();
             updateRequests();
             freed = true;
-            goToSleep(false);
+            goToSleep();
         }
     }
 
@@ -116,10 +116,10 @@ void Agent::receiveAndHandleMessage() {
             handleUpdateRequest(message);
             break;
         case Message::GO_TO_SLEEP:
-            handleGoToSleep(message, false);
+            handleGoToSleep(message);
             break;
         case Message::WAKE_UP:
-            handleWakeUp(message, false);
+            handleWakeUp(message);
             break;
         default:
             break;
@@ -162,6 +162,18 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
     if (isMoronsLeft()) {
         tryToPlaceMoronsInCompany(company, verbose);
     }
+}
+
+void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
+    sleepingAgents.insert(message->rank);
+    if(verbose)
+        printHandleGoToSleep(message->rank);
+}
+
+void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
+    sleepingAgents.erase(message->rank);
+    if(verbose)
+        printHandleWakeUp(message->rank);
 }
 
 void Agent::printHandleCompanyRequest(int companyId, int senderId, long senderClock) {
@@ -270,25 +282,41 @@ void Agent::printUpdateRequests(int companyId, long requestClock, int updatedReq
 }
 
 void Agent::goToSleep(bool verbose) {
-    sendGoToSleepMessage(false);
+    sendGoToSleepMessage();
     sleep(20);
-    sendWakeUpMessage(false);
+    sendWakeUpMessage();
 }
 
 void Agent::sendGoToSleepMessage(bool verbose) {
     Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
     messenger.sendToAll(message);
+    if(verbose)
+        printSendGoToSleep();
 }
 
 void Agent::sendWakeUpMessage(bool verbose) {
     Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
     messenger.sendToAll(message);
+    if(verbose)
+        printSendWakeUp();
 }
 
-void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
-    sleepingAgents.insert(message->rank);
+void Agent::printSendGoToSleep() {
+    printAgentInfoHeader();
+    std::cout << "sends message that is going to sleep\n";
 }
 
-void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
-    sleepingAgents.erase(message->rank);
+void Agent::printSendWakeUp() {
+    printAgentInfoHeader();
+    std::cout << "sends massage that is waking up\n";
+}
+
+void Agent::printHandleGoToSleep(int agentId) {
+    printAgentInfoHeader();
+    std::cout << "inserts to sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
+}
+
+void Agent::printHandleWakeUp(int agentId) {
+    printAgentInfoHeader();
+    std::cout << "removes from sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
 }
