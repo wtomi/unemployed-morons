@@ -21,7 +21,8 @@ public:
         UPDATE_REQUEST,
         GO_TO_SLEEP,
         WAKE_UP,
-        BREAK_COMPANY
+        BREAK_COMPANY,
+        REPAIR_COMPANY
     };
 
     int rank;
