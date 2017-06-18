@@ -86,15 +86,19 @@ void Agent::printAssingNewMorons(int numberOfAssignedMorons) {
 
 void Agent::requestEntranceToEveryCompany(bool verbose) {
     for (auto &company: this->companies) {
-        //any receiver can be passed as message is sent to all agents, -1 in this case
-        Message::SharedPtr requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
-                                                                          this->numberOfMoronsLeft);
-        messenger.sendToAll(requestMessage);
-
-        company->addRequestOfCurrentAgent(messenger.getClock(), numberOfMoronsLeft);
+        requestCompany(company);
     }
     if (verbose)
         printRequestEntranceToEveryCompany();
+}
+
+void Agent::requestCompany(Company::SharedPtr &company) {
+    //any receiver can be passed as message is sent to all agents, -1 in this case
+    Message::SharedPtr requestMessage = RequestCompanyMessage::Create(-1, TAG, company->getCompanyId(),
+                                                                      numberOfMoronsLeft);
+    messenger.sendToAll(requestMessage);
+
+    company->addRequestOfCurrentAgent(messenger.getClock(), numberOfMoronsLeft);
 }
 
 void Agent::printRequestEntranceToEveryCompany() {
@@ -122,6 +126,12 @@ void Agent::receiveAndHandleMessage() {
             break;
         case Message::WAKE_UP:
             handleWakeUp(message);
+            break;
+        case Message::BREAK_COMPANY:
+            handleBreakCompany(message);
+            break;
+        case Message::REPAIR_COMPANY:
+            handleRepairCompany(message);
             break;
         default:
             break;
@@ -168,13 +178,13 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
 
 void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
     sleepingAgents.insert(message->rank);
-    if(verbose)
+    if (verbose)
         printHandleGoToSleep(message->rank);
 }
 
 void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
     sleepingAgents.erase(message->rank);
-    if(verbose)
+    if (verbose)
         printHandleWakeUp(message->rank);
 }
 
@@ -288,14 +298,14 @@ void Agent::goToSleep(bool verbose) {
 void Agent::sendGoToSleepMessage(bool verbose) {
     Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
     messenger.sendToAll(message);
-    if(verbose)
+    if (verbose)
         printSendGoToSleep();
 }
 
 void Agent::sendWakeUpMessage(bool verbose) {
     Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
     messenger.sendToAll(message);
-    if(verbose)
+    if (verbose)
         printSendWakeUp();
 }
 
@@ -331,7 +341,7 @@ void Agent::sendBreakCompanyMessage(int companyId, int breakCount) {
 }
 
 void Agent::repairCompany(Company::SharedPtr company) {
-    sendRepairCompanyMessage(company->getCompanyId(),company->getRepairCount());
+    sendRepairCompanyMessage(company->getCompanyId(), company->getRepairCount());
     company->repairCompany();
 }
 
@@ -339,4 +349,32 @@ void Agent::sendRepairCompanyMessage(int companyId, int repairCount) {
     Message::SharedPtr message = RepairCompanyMessage::Create(messenger.getRank(), TAG, companyId, repairCount);
     messenger.sendToAll(message);
     messenger.send(message); //sends to main thread
+}
+
+void Agent::handleBreakCompany(Message::SharedPtr message) {
+    auto breakMessage = std::dynamic_pointer_cast<BreakCompanyMessage>(message);
+    auto company = companies[breakMessage->companyId];
+    if (!wasAlreadyBroken(company, breakMessage->breakCount)) {
+        breakCompany(company);
+    }
+}
+
+bool Agent::wasAlreadyBroken(Company::SharedPtr company, int breakCount) {
+    assert(company->getBreakCount() >= breakCount);
+    return breakCount != company->getBreakCount();
+}
+
+void Agent::handleRepairCompany(Message::SharedPtr message) {
+    auto repairMessage = std::dynamic_pointer_cast<RepairCompanyMessage>(message);
+    auto company = companies[repairMessage->companyId];
+    if (!wasAlreadyRepaired(company, repairMessage->repairCount)) {
+        repairCompany(company);
+        requestCompany(company);
+    }
+
+}
+
+bool Agent::wasAlreadyRepaired(Company::SharedPtr company, int repairCount) {
+    assert(company->getRepairCount() >= repairCount);
+    return repairCount != company->getRepairCount();
 }

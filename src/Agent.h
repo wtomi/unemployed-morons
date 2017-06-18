@@ -107,6 +107,16 @@ private:
     void repairCompany(Company::SharedPtr company);
 
     void sendRepairCompanyMessage(int companyId, int repairCount);
+
+    void handleBreakCompany(Message::SharedPtr message);
+
+    bool wasAlreadyBroken(Company::SharedPtr company, int breakCount);
+
+    void handleRepairCompany(Message::SharedPtr message);
+
+    bool wasAlreadyRepaired(Company::SharedPtr company, int repairCount);
+
+    void requestCompany(Company::SharedPtr &company);
 };
 
 
