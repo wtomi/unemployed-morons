@@ -127,4 +127,8 @@ bool Company::isBroken() {
     return broken;
 }
 
+int Company::getBreakCount() {
+    return breakCount;
+}
+
 

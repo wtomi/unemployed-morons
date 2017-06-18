@@ -101,6 +101,8 @@ private:
     void printHandleWakeUp(int agentId);
 
     void breakCompany(Company::SharedPtr company);
+
+    void sendBreakCompanyMessage(int companyId, int breakCount);
 };
 
 

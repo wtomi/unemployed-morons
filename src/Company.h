@@ -54,6 +54,8 @@ public:
 
     bool isBroken();
 
+    int getBreakCount();
+
     void resetLastRequestOfCurrentAgent();
 
 private:
