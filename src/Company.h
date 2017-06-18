@@ -60,6 +60,12 @@ public:
 
     void resetLastRequestOfCurrentAgent();
 
+    void damage(double damageValue);
+
+    bool isDamageExceeded();
+
+    int getNumberOfOccupiedPlacesToLastRequest();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId);
 
@@ -68,6 +74,7 @@ private:
     int maxDamageLevel;
     int agentId;
 
+    double actualDamageLevel = 0.0;
     RequestsQueue requestsQueue;
     AgentRequest::SharedPtr lastRequest = nullptr;
     std::set<int> replies;

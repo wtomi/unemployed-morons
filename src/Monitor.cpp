@@ -9,7 +9,8 @@ Monitor::SharedPtr Monitor::monitor = nullptr;
 
 Monitor::Monitor(int *argc, char ***argv, MPI_Comm mpiComm) {
     this->mpiComm = mpiComm;
-    MPI_Init(argc, argv);
+    int provided;
+    MPI_Init_thread(argc, argv, MPI_THREAD_SERIALIZED, &provided);
     MPI_Comm_rank(mpiComm, &this->rank);
     MPI_Comm_size(mpiComm, &this->size);
 }

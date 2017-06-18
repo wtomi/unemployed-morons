@@ -3,6 +3,7 @@ project(unemployed_morrons)
 
 find_package(MPI REQUIRED)
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+find_package (Threads)
 
 include_directories(include)
 
@@ -12,6 +13,7 @@ set(SOURCE_FILES src/main.cpp src/Monitor.cpp src/Monitor.h tests/tests.cpp src/
 add_executable(unemployed_morrons ${SOURCE_FILES})
 
 target_link_libraries(unemployed_morrons ${MPI_LIBRARIES})
+target_link_libraries (unemployed_morrons ${CMAKE_THREAD_LIBS_INIT})
 
 if (MPI_COMPILE_FLAGS)
     message("ASD")

@@ -6,6 +6,8 @@
 #define UNEMPLOYED_MORRONS_AGENT_H
 
 
+#include <mutex>
+#include <thread>
 #include "AgentInterface.h"
 #include "Configuration.h"
 #include "Company.h"
@@ -25,6 +27,8 @@ private:
     std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
     std::set<int> sleepingAgents;
+    std::mutex mtx;
+    std::thread t;
 
     void createCompanies();
 
@@ -117,6 +121,12 @@ private:
     bool wasAlreadyRepaired(Company::SharedPtr company, int repairCount);
 
     void requestCompany(Company::SharedPtr &company);
+
+    void monitorCompaniesDamage();
+
+    void runMonitorCompaniesDamageThread();
+
+    void resetLastRequestToAllCompanies();
 };
 
 

@@ -120,6 +120,7 @@ void Company::resetLastRequestOfCurrentAgent() {
 
 void Company::repairCompany() {
     broken = false;
+    actualDamageLevel = 0.0;
     repairCount++;
 }
 
@@ -133,6 +134,18 @@ int Company::getBreakCount() {
 
 int Company::getRepairCount() {
     return repairCount;
+}
+
+void Company::damage(double damageValue) {
+    actualDamageLevel += damageValue;
+}
+
+bool Company::isDamageExceeded() {
+    return actualDamageLevel > maxDamageLevel;
+}
+
+int Company::getNumberOfOccupiedPlacesToLastRequest() {
+    return maxNumberOfMorons - getNumberOfFreePlacesForLastRequestOfCurrentAgent();
 }
 
 
