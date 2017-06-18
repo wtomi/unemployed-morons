@@ -13,6 +13,8 @@
 #include "messages/GoToSleepMessage.h"
 #include "messages/WakeUpMessage.h"
 #include "messages/RequestBreakCompanyMessage.h"
+#include "messages/ReplyBreakCompanyMessage.h"
+#include "messages/BreakCompanyMessage.h"
 
 const int Agent::TAG = 0;
 const int Agent::NW = 6;
@@ -176,13 +178,13 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
 
 void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
     sleepingAgents.insert(message->rank);
-    if(verbose)
+    if (verbose)
         printHandleGoToSleep(message->rank);
 }
 
 void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
     sleepingAgents.erase(message->rank);
-    if(verbose)
+    if (verbose)
         printHandleWakeUp(message->rank);
 }
 
@@ -296,14 +298,14 @@ void Agent::goToSleep(bool verbose) {
 void Agent::sendGoToSleepMessage(bool verbose) {
     Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
     messenger.sendToAll(message);
-    if(verbose)
+    if (verbose)
         printSendGoToSleep();
 }
 
 void Agent::sendWakeUpMessage(bool verbose) {
     Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
     messenger.sendToAll(message);
-    if(verbose)
+    if (verbose)
         printSendWakeUp();
 }
 
@@ -327,9 +329,9 @@ void Agent::printHandleWakeUp(int agentId) {
     std::cout << "removes from sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
 }
 
-void Agent::breakCompany(Company::SharedPtr &company) {
+void Agent::requestBreakCompany(Company::SharedPtr &company) {
     sendRequestBreakCompany(company->getCompanyId());
-    company->breakCompany();
+    company->requestBreak(messenger.getClock());
 }
 
 void Agent::sendRequestBreakCompany(int companyId) {
@@ -338,13 +340,54 @@ void Agent::sendRequestBreakCompany(int companyId) {
 }
 
 void Agent::handleRequestBreakCompany(Message::SharedPtr message) {
+    auto requestBreakCompany = std::dynamic_pointer_cast<RequestBreakCompanyMessage>(message);
+    auto company = companies[requestBreakCompany->companyId];
+    if (!company->isBroken() ||
+        !hasPriority(company->getBreakRequestClock(), requestBreakCompany->clock, requestBreakCompany->rank)) {
+        sendReplyBreakCompany(requestBreakCompany->rank, requestBreakCompany->companyId);
+    }
+}
 
+bool Agent::hasPriority(long requestClockOfCurrentAgent, long requestClock, long agentId) {
+    if (requestClockOfCurrentAgent > requestClock) return false;
+    if (requestClockOfCurrentAgent < requestClock) return true;
+    if (messenger.getRank() > agentId) return false;
+    if (messenger.getRank() < agentId) return true;
+    assert(false);
 }
 
 void Agent::handleReplyBreakCompany(Message::SharedPtr message) {
-
+    auto replyBreakCompany = std::dynamic_pointer_cast<ReplyBreakCompanyMessage>(message);
+    auto company = companies[replyBreakCompany->companyId];
+    company->addReplyToBreakCompanyRequest(replyBreakCompany->rank);
+    if(hasAllRepliesToBreakCompanyRequest(company)) {
+        sendBreakCompanyMessage(company->getCompanyId());
+        //TODO maybe some action actually breaking company
+    }
 }
 
-void Agent::handleBreakCompany(Message::SharedPtr message) {
+bool Agent::hasAllRepliesToBreakCompanyRequest(Company::SharedPtr company) {
+    auto numberOfValidOfReplies = company->getNumberOfRepliesToBreakCompanyRequest(sleepingAgents);
+    return (numberOfValidOfReplies == (messenger.getSize() - 1 - sleepingAgents.size()));
+}
 
+void Agent::handleBreakCompany(Message::SharedPtr message, bool verbose) {
+    auto breakCompany = std::dynamic_pointer_cast<BreakCompanyMessage>(message);
+    if(verbose)
+        printHandleBreakCompany(breakCompany->companyId);
+}
+
+void Agent::sendReplyBreakCompany(int receiverId, int companyId) {
+    Message::SharedPtr message = ReplyBreakCompanyMessage::Create(receiverId, TAG, companyId);
+    messenger.send(message);
+}
+
+void Agent::sendBreakCompanyMessage(int companyId) {
+    Message::SharedPtr message = BreakCompanyMessage::Create(-1, TAG, companyId);
+    messenger.sendToAll(message);
+}
+
+void Agent::printHandleBreakCompany(int companyId) {
+    printAgentInfoHeader();
+    std::cout << "breaks company | companyId: " << std::setw(NW) << companyId << '\n';
 }
