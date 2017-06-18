@@ -232,11 +232,7 @@ void Agent::tryToPlaceMoronsInCompany(Company::SharedPtr company, bool verbose) 
 }
 
 void Agent::placeMoronsInCompany(Company::SharedPtr company, int numberOfFreePlaces, bool verbose) {
-    int numberOfTakenPlaces;
-    if (numberOfFreePlaces >= numberOfMoronsLeft)
-        numberOfTakenPlaces = numberOfMoronsLeft;
-    else
-        numberOfTakenPlaces = numberOfFreePlaces;
+    int numberOfTakenPlaces = (numberOfFreePlaces >= numberOfMoronsLeft) ? numberOfMoronsLeft : numberOfFreePlaces;
     company->placeMoronsInCompany(numberOfTakenPlaces);
     numberOfMoronsLeft -= numberOfTakenPlaces;
     if (verbose)
