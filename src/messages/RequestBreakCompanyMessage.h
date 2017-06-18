@@ -13,6 +13,8 @@ public:
 
     int companyId;
 
+    static SharedPtr Create(int rank, int tag, int companyId);
+
 private:
     friend class cereal::access;
     RequestBreakCompanyMessage(): Message() {}

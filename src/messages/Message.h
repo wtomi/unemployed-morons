@@ -22,7 +22,8 @@ public:
         GO_TO_SLEEP,
         WAKE_UP,
         REQUEST_BREAK_COMPANY,
-        REPLY_BREAK_COMPANY
+        REPLY_BREAK_COMPANY,
+        BREAK_COMPANY
     };
 
     int rank;
