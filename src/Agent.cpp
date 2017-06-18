@@ -316,3 +316,7 @@ void Agent::printHandleWakeUp(int agentId) {
     printAgentInfoHeader();
     std::cout << "removes from sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
 }
+
+void Agent::breakCompany(Company::SharedPtr company) {
+
+}

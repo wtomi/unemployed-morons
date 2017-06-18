@@ -99,6 +99,8 @@ private:
     void printHandleGoToSleep(int agentId);
 
     void printHandleWakeUp(int agentId);
+
+    void breakCompany(Company::SharedPtr company);
 };
 
 

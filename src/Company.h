@@ -48,21 +48,29 @@ public:
 
     bool isUsed();
 
+    void breakCompany();
+
+    void repairCompany();
+
+    bool isBroken();
+
+    void resetLastRequestOfCurrentAgent();
+
 private:
     Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId);
 
     int companyId;
     int maxNumberOfMorons;
     int maxDamageLevel;
-
     int agentId;
+
     RequestsQueue requestsQueue;
     AgentRequest::SharedPtr lastRequest = nullptr;
     std::set<int> replies;
     int numberOfMoronsPlaced = 0;
     int breakCount = 0;
     int repairCount = 0;
-    bool isBroken;
+    bool broken;
 };
 
 

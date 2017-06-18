@@ -23,6 +23,8 @@ public:
 
     AgentRequest::SharedPtr getNextRequest();
 
+    void clear();
+
 private:
     class RequestKey {
     public:

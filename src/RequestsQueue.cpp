@@ -33,4 +33,8 @@ AgentRequest::SharedPtr RequestsQueue::getNextRequest() {
         return nullptr;
 }
 
+void RequestsQueue::clear() {
+    orderedRequests.clear();
+}
+
 

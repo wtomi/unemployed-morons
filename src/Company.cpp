@@ -104,4 +104,27 @@ bool Company::isUsed() {
     return numberOfMoronsPlaced != 0;
 }
 
+void Company::breakCompany() {
+    assert(!broken);
+    broken = true;
+    breakCount++;
+    requestsQueue.clear();
+    resetLastRequestOfCurrentAgent();
+}
+
+void Company::resetLastRequestOfCurrentAgent() {
+    lastRequest = nullptr;
+    replies.clear();
+    numberOfMoronsPlaced = 0;
+}
+
+void Company::repairCompany() {
+    broken = false;
+    repairCount++;
+}
+
+bool Company::isBroken() {
+    return broken;
+}
+
 
