@@ -36,6 +36,11 @@ void Agent::run() {
     bool freed = false;
     assignNewMorons();
     requestEntranceToEveryCompany();
+    if (messenger.getRank() == 1) {
+        breakCompany(companies[0]);
+        goToSleep();
+        repairCompany(companies[0]);
+    }
     while (true) {
         receiveAndHandleMessage();
         if (!isMoronsLeft() && !freed) {
@@ -51,7 +56,7 @@ void Agent::run() {
 
 void Agent::freeUnusedCompanies(bool verbose) {
     for (auto &company: companies) {
-        if (!company->isUsed()) {
+        if (!company->isBroken() && !company->isUsed()) {
             auto request = company->getLastRequestOfCurrentAgent();
             sendGoOUtOfQueue(company->getCompanyId(), request->requestClock);
             company->removeLastRequestOfCurrentAgent();
@@ -63,7 +68,7 @@ void Agent::freeUnusedCompanies(bool verbose) {
 
 void Agent::updateRequests(bool verbose) {
     for (auto &company: companies) {
-        if (company->isChangedLastRequestOfCurrentAgent()) {
+        if (!company->isBroken() && company->isChangedLastRequestOfCurrentAgent()) {
             auto request = company->getLastRequestOfCurrentAgent();
             sendUpdateRequest(company->getCompanyId(), request->requestClock, company->getNumberOfMoronsPlaced());
             company->updateLastRequestOfCurrentAgent();
@@ -86,7 +91,8 @@ void Agent::printAssingNewMorons(int numberOfAssignedMorons) {
 
 void Agent::requestEntranceToEveryCompany(bool verbose) {
     for (auto &company: this->companies) {
-        requestCompany(company);
+        if (!company->isBroken())
+            requestCompany(company);
     }
     if (verbose)
         printRequestEntranceToEveryCompany();
@@ -142,37 +148,46 @@ void Agent::receiveAndHandleMessage() {
 void Agent::handleCompanyRequest(Message::SharedPtr &message, bool verbose) {
     auto requestMessage = std::dynamic_pointer_cast<RequestCompanyMessage>(message);
     int companyId = requestMessage->companyId;
+    auto company = companies[companyId];
+    if (!company->isBroken()) {
+        companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
+        sendReply(requestMessage->rank, companyId, requestMessage->clock);
+    }
     if (verbose)
         printHandleCompanyRequest(companyId, requestMessage->rank, requestMessage->clock);
-    companies[companyId]->addRequest(requestMessage->rank, requestMessage->clock, requestMessage->requestedPlaces);
-    sendReply(requestMessage->rank, companyId, requestMessage->clock);
 }
 
 void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbose) {
     auto replyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(message);
+    auto company = companies[replyMessage->companyId];
+    if (!company->isBroken()) {
+        company->addReply(replyMessage->rank, replyMessage->requestClock);
+        if (isMoronsLeft())
+            tryToPlaceMoronsInCompany(company);
+    }
     if (verbose)
         printHandleReplyToCompanyRequest(replyMessage->companyId);
-    auto company = companies[replyMessage->companyId];
-    company->addReply(replyMessage->rank, replyMessage->requestClock);
-    if (isMoronsLeft())
-        tryToPlaceMoronsInCompany(company);
 }
 
 void Agent::handleGoOutOfQueue(Message::SharedPtr message, bool verbose) {
     auto goOutMessage = std::dynamic_pointer_cast<GoOutOfQueueMessage>(message);
     auto company = companies[goOutMessage->companyId];
-    company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
-    if (isMoronsLeft())
-        tryToPlaceMoronsInCompany(company, verbose);
+    if (!company->isBroken()) {
+        company->removeRequest(goOutMessage->rank, goOutMessage->requestClock);
+        if (isMoronsLeft())
+            tryToPlaceMoronsInCompany(company, verbose);
+    }
 }
 
 void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
     auto updateRequestMessage = std::dynamic_pointer_cast<UpdateRequestMessage>(message);
     auto company = companies[updateRequestMessage->companyId];
-    company->updateRequest(updateRequestMessage->rank, updateRequestMessage->requestClock,
-                           updateRequestMessage->updatedRequestedPlaces);
-    if (isMoronsLeft()) {
-        tryToPlaceMoronsInCompany(company, verbose);
+    if (!company->isBroken()) {
+        company->updateRequest(updateRequestMessage->rank, updateRequestMessage->requestClock,
+                               updateRequestMessage->updatedRequestedPlaces);
+        if (isMoronsLeft()) {
+            tryToPlaceMoronsInCompany(company, verbose);
+        }
     }
 }
 
@@ -335,20 +350,20 @@ void Agent::breakCompany(Company::SharedPtr company) {
 }
 
 void Agent::sendBreakCompanyMessage(int companyId, int breakCount) {
-    Message::SharedPtr message = BreakCompanyMessage::Create(messenger.getRank(), TAG, companyId, breakCount);
+    Message::SharedPtr message = BreakCompanyMessage::Create(-1, TAG, companyId, breakCount);
     messenger.sendToAll(message);
-    messenger.send(message); //sends to main thread
 }
 
 void Agent::repairCompany(Company::SharedPtr company) {
     sendRepairCompanyMessage(company->getCompanyId(), company->getRepairCount());
     company->repairCompany();
+    if (isMoronsLeft()) //not sure if condition is necessary
+        requestCompany(company);
 }
 
 void Agent::sendRepairCompanyMessage(int companyId, int repairCount) {
-    Message::SharedPtr message = RepairCompanyMessage::Create(messenger.getRank(), TAG, companyId, repairCount);
+    Message::SharedPtr message = RepairCompanyMessage::Create(-1, TAG, companyId, repairCount);
     messenger.sendToAll(message);
-    messenger.send(message); //sends to main thread
 }
 
 void Agent::handleBreakCompany(Message::SharedPtr message) {
@@ -369,7 +384,6 @@ void Agent::handleRepairCompany(Message::SharedPtr message) {
     auto company = companies[repairMessage->companyId];
     if (!wasAlreadyRepaired(company, repairMessage->repairCount)) {
         repairCompany(company);
-        requestCompany(company);
     }
 
 }

@@ -74,7 +74,7 @@ private:
     int numberOfMoronsPlaced = 0;
     int breakCount = 0;
     int repairCount = 0;
-    bool broken;
+    bool broken = false;
 };
 
 
