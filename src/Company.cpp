@@ -2,6 +2,8 @@
 // Created by tommy on 12.06.17.
 //
 
+#include <cereal/types/vector.hpp>
+#include <algorithm>
 #include "Company.h"
 
 Company::Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId)
@@ -29,14 +31,21 @@ void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
     requestsQueue.addRequest(agentRequest);
 }
 
-void Company::addReply(long requestClock) {
+void Company::addReply(int agentId, long requestClock) {
     if (lastRequest != nullptr)
         if (requestClock == lastRequest->requestClock)
-            numberOfReplies++;
+            replies.insert(agentId);
 }
 
 int Company::getNumberOfReplies() {
-    return numberOfReplies;
+    return static_cast<int>(replies.size());
+}
+
+int Company::getNumberOfRepliesAfterSubtracting(std::set<int> sleepingAgents) {
+    std::vector<int> difference(replies.size());
+    auto it = std::set_difference(replies.begin(), replies.end(),
+                                  sleepingAgents.begin(), sleepingAgents.end(), difference.begin());
+    return static_cast<int>(it - difference.begin());
 }
 
 int Company::getNumberOfFreePlacesForLastRequestOfCurrentAgent() {

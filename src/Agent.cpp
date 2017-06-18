@@ -40,7 +40,7 @@ void Agent::run() {
             freeUnusedCompanies();
             updateRequests();
             freed = true;
-            goToSleep();
+            goToSleep(false);
         }
     }
 
@@ -116,10 +116,10 @@ void Agent::receiveAndHandleMessage() {
             handleUpdateRequest(message);
             break;
         case Message::GO_TO_SLEEP:
-            handleGoToSleep(message);
+            handleGoToSleep(message, false);
             break;
         case Message::WAKE_UP:
-            handleWakeUp(message);
+            handleWakeUp(message, false);
             break;
         default:
             break;
@@ -141,7 +141,7 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
     if (verbose)
         printHandleReplyToCompanyRequest(replyMessage->companyId);
     auto company = companies[replyMessage->companyId];
-    company->addReply(replyMessage->requestClock);
+    company->addReply(replyMessage->rank, replyMessage->requestClock);
     if (isMoronsLeft())
         tryToPlaceMoronsInCompany(company);
 }
@@ -191,7 +191,8 @@ void Agent::printHandleReplyToCompanyRequest(int companyId) {
 
 bool Agent::hasAllReplies(const Company::SharedPtr company, bool verbose) {
     assert(company->getNumberOfReplies() <= (messenger.getSize() - 1));
-    bool hasAllReplies = company->getNumberOfReplies() == (messenger.getSize() - 1);
+    auto numberOfValidReplies = company->getNumberOfRepliesAfterSubtracting(sleepingAgents);
+    bool hasAllReplies = numberOfValidReplies == (messenger.getSize() - 1 - sleepingAgents.size());
     if (verbose)
         printHasAllReplies(hasAllReplies);
     return hasAllReplies;
@@ -268,26 +269,26 @@ void Agent::printUpdateRequests(int companyId, long requestClock, int updatedReq
               << " | updatedRequestedPlaces: " << std::setw(NW) << updatedRequestedPlaces << '\n';
 }
 
-void Agent::goToSleep() {
-    sendGoToSleepMessage();
-    sleep(5000);
-    sendWakeUpMessage();
+void Agent::goToSleep(bool verbose) {
+    sendGoToSleepMessage(false);
+    sleep(20);
+    sendWakeUpMessage(false);
 }
 
-void Agent::sendGoToSleepMessage() {
+void Agent::sendGoToSleepMessage(bool verbose) {
     Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
     messenger.sendToAll(message);
 }
 
-void Agent::sendWakeUpMessage() {
+void Agent::sendWakeUpMessage(bool verbose) {
     Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
     messenger.sendToAll(message);
 }
 
-void Agent::handleGoToSleep(Message::SharedPtr message) {
+void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
     sleepingAgents.insert(message->rank);
 }
 
-void Agent::handleWakeUp(Message::SharedPtr message) {
+void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
     sleepingAgents.erase(message->rank);
 }

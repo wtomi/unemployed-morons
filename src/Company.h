@@ -6,6 +6,7 @@
 #define UNEMPLOYED_MORRONS_COMPANY_H
 
 
+#include <set>
 #include "AgentRequest.h"
 #include "RequestsQueue.h"
 
@@ -27,9 +28,11 @@ public:
 
     AgentRequest::SharedPtr getLastRequestOfCurrentAgent();
 
-    void addReply(long requestClock);
+    void addReply(int agentId, long requestClock);
 
     int getNumberOfReplies();
+
+    int getNumberOfRepliesAfterSubtracting(std::set<int> sleepingAgents);
 
     int getNumberOfFreePlacesForLastRequestOfCurrentAgent();
 
@@ -55,7 +58,7 @@ private:
     int agentId;
     RequestsQueue requestsQueue;
     AgentRequest::SharedPtr lastRequest = nullptr;
-    int numberOfReplies = 0;
+    std::set<int> replies;
     int numberOfMoronsPlaced = 0;
 };
 
