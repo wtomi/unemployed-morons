@@ -26,7 +26,6 @@ private:
     Messenger messenger;
     std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
-    std::set<int> sleepingAgents;
     std::mutex mtx;
     std::thread t;
 
@@ -85,24 +84,6 @@ private:
     void printFreeUnusedCompanies(int companyId, long requestClock);
 
     void printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces);
-
-    void goToSleep(bool verbose = true);
-
-    void sendGoToSleepMessage(bool verbose = true);
-
-    void sendWakeUpMessage(bool verbose = true);
-
-    void handleGoToSleep(Message::SharedPtr message, bool verbose = true);
-
-    void handleWakeUp(Message::SharedPtr message, bool verbose = true);
-
-    void printSendGoToSleep();
-
-    void printSendWakeUp();
-
-    void printHandleGoToSleep(int agentId);
-
-    void printHandleWakeUp(int agentId);
 
     void breakCompany(Company::SharedPtr company, bool verbose = true);
 

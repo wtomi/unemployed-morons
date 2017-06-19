@@ -43,13 +43,11 @@ void Agent::run() {
             if (!isMoronsLeft()) {
                 freeUnusedCompanies();
                 updateRequests();
-                goToSleep();
                 resetLastRequestToAllCompanies();
                 break;
             }
         }
     }
-
     //TODO implemnt
 }
 
@@ -130,12 +128,6 @@ void Agent::receiveAndHandleMessage() {
         case Message::UPDATE_REQUEST:
             handleUpdateRequest(message);
             break;
-        case Message::GO_TO_SLEEP:
-            handleGoToSleep(message);
-            break;
-        case Message::WAKE_UP:
-            handleWakeUp(message);
-            break;
         case Message::BREAK_COMPANY:
             handleBreakCompany(message);
             break;
@@ -164,7 +156,7 @@ void Agent::handleReplyToCompanyRequest(Message::SharedPtr &message, bool verbos
     auto replyMessage = std::dynamic_pointer_cast<ReplyCompanyMessage>(message);
     auto company = companies[replyMessage->companyId];
     if (!company->isBroken()) {
-        company->addReply(replyMessage->rank, replyMessage->requestClock);
+        company->addReply(replyMessage->requestClock);
         if (isMoronsLeft())
             tryToPlaceMoronsInCompany(company);
     }
@@ -193,19 +185,6 @@ void Agent::handleUpdateRequest(Message::SharedPtr message, bool verbose) {
         }
     }
 }
-
-void Agent::handleGoToSleep(Message::SharedPtr message, bool verbose) {
-    sleepingAgents.insert(message->rank);
-    if (verbose)
-        printHandleGoToSleep(message->rank);
-}
-
-void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
-    sleepingAgents.erase(message->rank);
-    if (verbose)
-        printHandleWakeUp(message->rank);
-}
-
 void Agent::printHandleCompanyRequest(int companyId, int senderId, long senderClock) {
     printAgentInfoHeader();
     std::cout << "receives company request message | companyId: " << std::setw(NW) << companyId
@@ -233,8 +212,7 @@ void Agent::printHandleReplyToCompanyRequest(int companyId) {
 
 bool Agent::hasAllReplies(const Company::SharedPtr company, bool verbose) {
     assert(company->getNumberOfReplies() <= (messenger.getSize() - 1));
-    auto numberOfValidReplies = company->getNumberOfRepliesAfterSubtracting(sleepingAgents);
-    bool hasAllReplies = numberOfValidReplies == (messenger.getSize() - 1 - sleepingAgents.size());
+    bool hasAllReplies = company->getNumberOfReplies() == (messenger.getSize() - 1);
     if (verbose)
         printHasAllReplies(hasAllReplies);
     return hasAllReplies;
@@ -305,48 +283,6 @@ void Agent::printUpdateRequests(int companyId, long requestClock, int updatedReq
     std::cout << " sends message to update request | companyId: " << std::setw(NW) << companyId
               << " | requestClock: " << std::setw(NW) << requestClock
               << " | updatedRequestedPlaces: " << std::setw(NW) << updatedRequestedPlaces << '\n';
-}
-
-void Agent::goToSleep(bool verbose) {
-    sendGoToSleepMessage();
-    mtx.unlock();
-    sleep(configuration->agentSleepTime);
-    mtx.lock();
-    sendWakeUpMessage();
-}
-
-void Agent::sendGoToSleepMessage(bool verbose) {
-    Message::SharedPtr message = GoToSleepMessage::Create(-1, TAG);
-    messenger.sendToAll(message);
-    if (verbose)
-        printSendGoToSleep();
-}
-
-void Agent::sendWakeUpMessage(bool verbose) {
-    Message::SharedPtr message = WakeUpMessage::Create(-1, TAG);
-    messenger.sendToAll(message);
-    if (verbose)
-        printSendWakeUp();
-}
-
-void Agent::printSendGoToSleep() {
-    printAgentInfoHeader();
-    std::cout << "sends message that is going to sleep\n";
-}
-
-void Agent::printSendWakeUp() {
-    printAgentInfoHeader();
-    std::cout << "sends massage that is waking up\n";
-}
-
-void Agent::printHandleGoToSleep(int agentId) {
-    printAgentInfoHeader();
-    std::cout << "inserts to sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
-}
-
-void Agent::printHandleWakeUp(int agentId) {
-    printAgentInfoHeader();
-    std::cout << "removes from sleeping set | agentId: " << std::setw(NW) << agentId << '\n';
 }
 
 void Agent::breakCompany(Company::SharedPtr company, bool verbose) {

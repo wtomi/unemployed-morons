@@ -8,7 +8,7 @@
     "companies": [
       {
         "maxDamageLevel": 10,
-        "maxMorons": 12
+        "maxMorons": 8
       },
       {
         "maxDamageLevel": 15,
@@ -16,7 +16,7 @@
       },
       {
         "maxDamageLevel": 10,
-        "maxMorons": 20
+        "maxMorons": 8
       }
     ]
   }
