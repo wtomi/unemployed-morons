@@ -104,11 +104,11 @@ private:
 
     void printHandleWakeUp(int agentId);
 
-    void breakCompany(Company::SharedPtr company);
+    void breakCompany(Company::SharedPtr company, bool verbose = true);
 
     void sendBreakCompanyMessage(int companyId, int breakCount);
 
-    void repairCompany(Company::SharedPtr company);
+    void repairCompany(Company::SharedPtr company, bool verbose = true);
 
     void sendRepairCompanyMessage(int companyId, int repairCount);
 
@@ -127,6 +127,23 @@ private:
     void runMonitorCompaniesDamageThread();
 
     void resetLastRequestToAllCompanies();
+
+    void monitorCompanies(std::vector<int> &companiesIterationsLeft);
+
+    int computeWaitIterations() const;
+
+    void monitorCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft);
+
+    void
+    updateCompanyDamage(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft, int waitIterations);
+
+    void tryToRepairCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft);
+
+    double computeDamageIncrease(Company::SharedPtr &company) const;
+
+    void printBreakCompany(Company::SharedPtr company);
+
+    void printRepairCompany(Company::SharedPtr company);
 };
 
 
