@@ -58,7 +58,6 @@ void Agent::freeUnusedCompanies(bool verbose) {
         if (!company->isBroken() && !company->isUsed()) {
             auto request = company->getLastRequestOfCurrentAgent();
             sendGoOUtOfQueue(company->getCompanyId(), request->requestClock);
-            company->removeLastRequestOfCurrentAgent();
             if (verbose)
                 printFreeUnusedCompanies(company->getCompanyId(), request->requestClock);
         }
@@ -395,7 +394,6 @@ void Agent::handleRepairCompany(Message::SharedPtr message) {
     if (!wasAlreadyRepaired(company, repairMessage->repairCount)) {
         repairCompany(company);
     }
-
 }
 
 bool Agent::wasAlreadyRepaired(Company::SharedPtr company, int repairCount) {
@@ -432,9 +430,9 @@ void Agent::monitorCompanies(std::vector<int> &companiesIterationsLeft) {
 
 void Agent::monitorCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) {
     static int waitIterations = computeWaitIterations();
-    if (!company->isBroken() && company->isUsed()) {
+    if (!company->isBroken()) {
         updateCompanyDamage(company, companiesIterationsLeft, waitIterations);
-    } else if (companiesIterationsLeft[company->getCompanyId()] > 0) {
+    } else if (ifCurrentAgentBroke(company, companiesIterationsLeft)) {
         tryToRepairCompany(company, companiesIterationsLeft);
     }
 }
@@ -446,6 +444,10 @@ void Agent::updateCompanyDamage(Company::SharedPtr &company, std::vector<int> &c
         breakCompany(company);
         companiesIterationsLeft[company->getCompanyId()] = waitIterations;
     }
+}
+
+bool Agent::ifCurrentAgentBroke(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) const {
+    return companiesIterationsLeft[company->getCompanyId()] > 0;
 }
 
 void Agent::tryToRepairCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) {

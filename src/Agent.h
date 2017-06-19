@@ -144,6 +144,8 @@ private:
     void printBreakCompany(Company::SharedPtr company);
 
     void printRepairCompany(Company::SharedPtr company);
+
+    bool ifCurrentAgentBroke(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) const;
 };
 
 

@@ -61,7 +61,7 @@ int Company::getNumberOfFreePlacesForLastRequestOfCurrentAgent() {
 }
 
 bool Company::isChangedLastRequestOfCurrentAgent() {
-    if (lastRequest == nullptr) return false;
+    if (numberOfMoronsPlaced == 0) return false;
     auto request = requestsQueue.getAgentRequest(lastRequest->agentId, lastRequest->requestClock);
     assert(numberOfMoronsPlaced <= request->numberOfMorons);
     return numberOfMoronsPlaced != request->numberOfMorons;
