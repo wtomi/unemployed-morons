@@ -27,7 +27,9 @@ private:
     std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
     std::mutex mtx;
-    std::thread t;
+    std::thread tMonitorDamage;
+    std::thread tSleep;
+    bool sleeping = false;
 
     void createCompanies();
 
@@ -103,7 +105,7 @@ private:
 
     void requestCompany(Company::SharedPtr &company);
 
-    void monitorCompaniesDamage();
+    void threadMonitorCompaniesDamage();
 
     void runMonitorCompaniesDamageThread();
 
@@ -127,6 +129,16 @@ private:
     void printRepairCompany(Company::SharedPtr company);
 
     bool ifCurrentAgentBroke(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) const;
+
+    void goToSleep(bool verbose = true);
+
+    void threadSleep();
+
+    void handleWakeUp(Message::SharedPtr message, bool verbose = true);
+
+    void printHandleWakeUp();
+
+    void printGoToSleep();
 };
 
 

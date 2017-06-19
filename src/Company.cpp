@@ -100,7 +100,6 @@ void Company::breakCompany() {
     broken = true;
     breakCount++;
     requestsQueue.clear();
-    resetLastRequestOfCurrentAgent();
 }
 
 void Company::resetLastRequestOfCurrentAgent() {

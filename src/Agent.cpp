@@ -11,7 +11,6 @@
 #include "messages/ReplyCompanyMessage.h"
 #include "messages/GoOutOfQueueMessage.h"
 #include "messages/UpdateRequestMessage.h"
-#include "messages/GoToSleepMessage.h"
 #include "messages/WakeUpMessage.h"
 #include "messages/BreakCompanyMessage.h"
 #include "messages/RepairCompanyMessage.h"
@@ -38,11 +37,16 @@ void Agent::run() {
     while (true) {
         assignNewMorons();
         requestEntranceToEveryCompany();
+        bool freed = false;
         while (true) {
             receiveAndHandleMessage();
-            if (!isMoronsLeft()) {
+            if (!isMoronsLeft() && !freed) {
                 freeUnusedCompanies();
                 updateRequests();
+                goToSleep();
+                freed = true;
+            }
+            if(freed && !sleeping) {
                 resetLastRequestToAllCompanies();
                 break;
             }
@@ -133,6 +137,9 @@ void Agent::receiveAndHandleMessage() {
             break;
         case Message::REPAIR_COMPANY:
             handleRepairCompany(message);
+            break;
+        case Message::WAKE_UP:
+            handleWakeUp(message);
             break;
         default:
             break;
@@ -301,6 +308,7 @@ void Agent::repairCompany(Company::SharedPtr company, bool verbose) {
     sendRepairCompanyMessage(company->getCompanyId(), company->getRepairCount());
     company->repairCompany();
     if (isMoronsLeft()) //not sure if condition is necessary
+        company->resetLastRequestOfCurrentAgent();
         requestCompany(company);
     if (verbose)
         printRepairCompany(company);
@@ -345,10 +353,10 @@ void Agent::resetLastRequestToAllCompanies() {
 }
 
 void Agent::runMonitorCompaniesDamageThread() {
-    t = std::thread(&Agent::monitorCompaniesDamage, std::ref(*this));
+    tMonitorDamage = std::thread(&Agent::threadMonitorCompaniesDamage, std::ref(*this));
 }
 
-void Agent::monitorCompaniesDamage() {
+void Agent::threadMonitorCompaniesDamage() {
     std::vector<int> companiesIterationsLeft(companies.size(), 0);
     while (true) {
         usleep(configuration->threadUSleepTime);
@@ -413,4 +421,37 @@ void Agent::printRepairCompany(Company::SharedPtr company) {
     printAgentInfoHeader();
     std::cout << "repairs company | companyId : " << std::setw(NW) << company->getCompanyId()
               << " | repair count: " << std::setw(NW) << company->getRepairCount() << '\n';
+}
+
+void Agent::goToSleep(bool verbose) {
+    sleeping = true;
+    tSleep = std::thread(&Agent::threadSleep, std::ref(*this));
+    if(verbose)
+        printGoToSleep();
+}
+
+void Agent::threadSleep() {
+    sleep(configuration->agentSleepTime);
+    mtx.lock();
+    Message::SharedPtr message = WakeUpMessage::Create(messenger.getRank(), TAG);
+    messenger.send(message);
+    mtx.unlock();
+}
+
+void Agent::handleWakeUp(Message::SharedPtr message, bool verbose) {
+    tSleep.join();
+    tSleep.~thread();
+    sleeping = false;
+    if(verbose)
+        printHandleWakeUp();
+}
+
+void Agent::printHandleWakeUp() {
+    printAgentInfoHeader();
+    std::cout << "is waking up\n";
+}
+
+void Agent::printGoToSleep() {
+    printAgentInfoHeader();
+    std::cout << "is going to sleep\n";
 }
