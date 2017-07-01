@@ -1,10 +1,14 @@
 {
   "configuration": {
     "initialMoronsNumberPerAgent": 10,
+    "agentSleepTime": 5,
+    "companySleepTime": 10,
+    "threadUSleepTime": 100000,
+    "damageFactor": 0.1,
     "companies": [
       {
         "maxDamageLevel": 10,
-        "maxMorons": 50
+        "maxMorons": 8
       },
       {
         "maxDamageLevel": 15,
@@ -12,7 +16,7 @@
       },
       {
         "maxDamageLevel": 10,
-        "maxMorons": 50
+        "maxMorons": 8
       }
     ]
   }

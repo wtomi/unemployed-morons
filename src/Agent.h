@@ -26,9 +26,10 @@ private:
     Messenger messenger;
     std::vector<Company::SharedPtr> companies;
     int numberOfMoronsLeft;
-    std::set<int> sleepingAgents;
     std::mutex mtx;
-    std::thread t;
+    std::thread tMonitorDamage;
+    std::thread tSleep;
+    bool sleeping = false;
 
     void createCompanies();
 
@@ -86,29 +87,11 @@ private:
 
     void printUpdateRequests(int companyId, long requestClock, int updatedRequestedPlaces);
 
-    void goToSleep(bool verbose = true);
-
-    void sendGoToSleepMessage(bool verbose = true);
-
-    void sendWakeUpMessage(bool verbose = true);
-
-    void handleGoToSleep(Message::SharedPtr message, bool verbose = true);
-
-    void handleWakeUp(Message::SharedPtr message, bool verbose = true);
-
-    void printSendGoToSleep();
-
-    void printSendWakeUp();
-
-    void printHandleGoToSleep(int agentId);
-
-    void printHandleWakeUp(int agentId);
-
-    void breakCompany(Company::SharedPtr company);
+    void breakCompany(Company::SharedPtr company, bool verbose = true);
 
     void sendBreakCompanyMessage(int companyId, int breakCount);
 
-    void repairCompany(Company::SharedPtr company);
+    void repairCompany(Company::SharedPtr company, bool verbose = true);
 
     void sendRepairCompanyMessage(int companyId, int repairCount);
 
@@ -122,11 +105,40 @@ private:
 
     void requestCompany(Company::SharedPtr &company);
 
-    void monitorCompaniesDamage();
+    void threadMonitorCompaniesDamage();
 
     void runMonitorCompaniesDamageThread();
 
     void resetLastRequestToAllCompanies();
+
+    void monitorCompanies(std::vector<int> &companiesIterationsLeft);
+
+    int computeWaitIterations() const;
+
+    void monitorCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft);
+
+    void
+    updateCompanyDamage(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft, int waitIterations);
+
+    void tryToRepairCompany(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft);
+
+    double computeDamageIncrease(Company::SharedPtr &company) const;
+
+    void printBreakCompany(Company::SharedPtr company);
+
+    void printRepairCompany(Company::SharedPtr company);
+
+    bool ifCurrentAgentBroke(Company::SharedPtr &company, std::vector<int> &companiesIterationsLeft) const;
+
+    void goToSleep(bool verbose = true);
+
+    void threadSleep();
+
+    void handleWakeUp(Message::SharedPtr message, bool verbose = true);
+
+    void printHandleWakeUp();
+
+    void printGoToSleep();
 };
 
 

@@ -33,6 +33,10 @@ public:
 
     int initialMoronsNumberPerAgent;
     std::vector<Company> companies;
+    unsigned int agentSleepTime;
+    unsigned int companySleepTime;
+    unsigned int threadUSleepTime;
+    double damageFactor;
 
     void sendConfigurationToAllProceses();
 private:
@@ -41,7 +45,9 @@ private:
 
     template<class Archive>
     void serialize(Archive &archive) {
-        archive(CEREAL_NVP(initialMoronsNumberPerAgent), CEREAL_NVP(companies));
+        archive(CEREAL_NVP(initialMoronsNumberPerAgent), CEREAL_NVP(companies),
+        CEREAL_NVP(agentSleepTime), CEREAL_NVP(companySleepTime), CEREAL_NVP(threadUSleepTime),
+        CEREAL_NVP(damageFactor));
     }
 
     void sendToAll(Monitor::SharedPtr monitor, Packet::SharedPtr packet);
