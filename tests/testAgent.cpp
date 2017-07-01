@@ -9,7 +9,7 @@ TEST_CASE("Test agent", "[agent]") {
     auto monitor = Monitor::getMonitor();
     Configuration::SharedPtr configuration;
     if (monitor->rank == 0) {
-        configuration = Configuration::Create("testconfig.json");
+        configuration = Configuration::Create("config.json");
         configuration->sendConfigurationToAllProceses();
     } else {
         configuration = Configuration::CreateFromReceivedMessage();

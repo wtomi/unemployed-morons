@@ -19,8 +19,9 @@ public:
         REPLY_COMPANY_REQUEST,
         GO_OUT_OF_QUEUE,
         UPDATE_REQUEST,
-        GO_TO_SLEEP,
-        WAKE_UP
+        WAKE_UP,
+        BREAK_COMPANY,
+        REPAIR_COMPANY
     };
 
     int rank;

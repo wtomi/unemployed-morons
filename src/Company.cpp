@@ -2,8 +2,6 @@
 // Created by tommy on 12.06.17.
 //
 
-#include <cereal/types/vector.hpp>
-#include <algorithm>
 #include "Company.h"
 
 Company::Company(int companyId, int maxDamageLevel, int maxNumberOfMorons, int agentId)
@@ -31,21 +29,14 @@ void Company::addRequest(int agentId, long agentClock, int requestedPlaces) {
     requestsQueue.addRequest(agentRequest);
 }
 
-void Company::addReply(int agentId, long requestClock) {
+void Company::addReply(long requestClock) {
     if (lastRequest != nullptr)
         if (requestClock == lastRequest->requestClock)
-            replies.insert(agentId);
+            numberOfReplies++;
 }
 
 int Company::getNumberOfReplies() {
-    return static_cast<int>(replies.size());
-}
-
-int Company::getNumberOfRepliesAfterSubtracting(std::set<int> sleepingAgents) {
-    std::vector<int> difference(replies.size());
-    auto it = std::set_difference(replies.begin(), replies.end(),
-                                  sleepingAgents.begin(), sleepingAgents.end(), difference.begin());
-    return static_cast<int>(it - difference.begin());
+    return numberOfReplies;
 }
 
 int Company::getNumberOfFreePlacesForLastRequestOfCurrentAgent() {
@@ -61,7 +52,7 @@ int Company::getNumberOfFreePlacesForLastRequestOfCurrentAgent() {
 }
 
 bool Company::isChangedLastRequestOfCurrentAgent() {
-    if (lastRequest == nullptr) return false;
+    if (numberOfMoronsPlaced == 0) return false;
     auto request = requestsQueue.getAgentRequest(lastRequest->agentId, lastRequest->requestClock);
     assert(numberOfMoronsPlaced <= request->numberOfMorons);
     return numberOfMoronsPlaced != request->numberOfMorons;
@@ -102,6 +93,49 @@ AgentRequest::SharedPtr Company::getLastRequestOfCurrentAgent() {
 
 bool Company::isUsed() {
     return numberOfMoronsPlaced != 0;
+}
+
+void Company::breakCompany() {
+    assert(!broken);
+    broken = true;
+    breakCount++;
+    requestsQueue.clear();
+}
+
+void Company::resetLastRequestOfCurrentAgent() {
+    lastRequest = nullptr;
+    numberOfReplies = 0;
+    numberOfMoronsPlaced = 0;
+}
+
+void Company::repairCompany() {
+    broken = false;
+    actualDamageLevel = 0.0;
+    repairCount++;
+}
+
+bool Company::isBroken() {
+    return broken;
+}
+
+int Company::getBreakCount() {
+    return breakCount;
+}
+
+int Company::getRepairCount() {
+    return repairCount;
+}
+
+void Company::damage(double damageValue) {
+    actualDamageLevel += damageValue;
+}
+
+bool Company::isDamageExceeded() {
+    return actualDamageLevel > maxDamageLevel;
+}
+
+int Company::getNumberOfOccupiedPlacesToLastRequest() {
+    return maxNumberOfMorons - getNumberOfFreePlacesForLastRequestOfCurrentAgent();
 }
 
 
